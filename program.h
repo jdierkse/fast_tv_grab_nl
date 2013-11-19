@@ -3,6 +3,7 @@
 
 #include <string>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/serialization/access.hpp>
 #include "channel.h"
 
 
@@ -11,10 +12,16 @@ class Program
 public:
 	Program(Channel channel);
 
-	void LoadFromJSON(std::string json);
+	bool operator ==(const int& value)
+	{
+		return m_id == value;
+	}
+
+	void LoadDetailsFromJSON(std::string json);
 	std::string GetXML();
 
 	Channel GetChannel();
+	bool GetDetailsLoaded();
 
 	void SetId(int id);
 	int GetId();
@@ -47,11 +54,37 @@ public:
 	std::string GetDirector();
 
 private:
+	Program();
+
+private:
+	friend class boost::serialization::access;
+	template <class Archive>
+	void serialize(Archive &ar, const unsigned int version)
+	{
+		ar & m_channel;
+		ar & m_detailsLoaded;
+		ar & m_id;
+		ar & m_title;
+		ar & m_genre;
+		ar & m_type;
+		ar & m_rating;
+		ar & m_articleId;
+		ar & m_articleTitle;
+		ar & m_dateStart;
+		ar & m_dateEnd;
+		ar & m_synopsis;
+		ar & m_hosts;
+		ar & m_actors;
+		ar & m_director;
+	}
+
+private:
 	std::string ConvertGenre(std::string genre);
 	std::string ConvertDate(std::string date);
 
 private:
 	Channel m_channel;
+	bool m_detailsLoaded;
 
 	int m_id;
 	std::string m_title;

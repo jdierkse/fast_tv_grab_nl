@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/serialization/vector.hpp>
 #include "channel.h"
 #include "program.h"
 
@@ -21,6 +22,14 @@ public:
 	reverse_iterator rbegin();
 	reverse_iterator rend();
 	size_t size();
+
+private:
+        friend class boost::serialization::access;
+	template <class Archive>
+	void serialize(Archive &ar, const unsigned int version)
+	{
+		ar & m_programs;
+	}
 
 private:
 	std::vector<Program> m_programs;

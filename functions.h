@@ -10,7 +10,7 @@
 
 
 Channels GetChannels();
-Programs GetPrograms(Channels channels, int days = 4, bool fast = false, bool quiet = false);
+Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool cache, std::string cacheFilename);
 std::vector<std::string> SplitString(std::string string, std::string delimiter);
 
 #endif // FUNCTIONS_H

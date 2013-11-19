@@ -22,6 +22,10 @@ void Programs::LoadFromJSON(Channel channel, std::string json)
 		try
 		{
 			program.SetId(val.second.get<int>("db_id"));
+
+			if (std::find(m_programs.begin(), m_programs.end(), program.GetId()) != m_programs.end())
+				continue;
+
 			program.SetTitle(val.second.get<std::string>("titel"));
 			program.SetType(val.second.get<std::string>("soort"));
 			program.SetGenre(val.second.get<std::string>("genre"));
@@ -36,12 +40,18 @@ void Programs::LoadFromJSON(Channel channel, std::string json)
 			catch (const boost::property_tree::ptree_bad_data &e)
 			{
 			}
+			catch (const boost::property_tree::ptree_bad_path &e)
+			{
+			}
 			
 			try
 			{
 				program.SetArticleTitle(val.second.get<std::string>("artikel_titel"));
 			}
 			catch (const boost::property_tree::ptree_bad_data &e)
+			{
+			}
+			catch (const boost::property_tree::ptree_bad_path &e)
 			{
 			}
 

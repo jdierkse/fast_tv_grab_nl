@@ -7,12 +7,18 @@
 #include "program.h"
 
 
-Program::Program(Channel channel) :
-	m_channel(channel)
+Program::Program() :
+	m_detailsLoaded(false)
 {
 }
 
-void Program::LoadFromJSON(std::string json)
+Program::Program(Channel channel) :
+	m_channel(channel),
+	m_detailsLoaded(false)
+{
+}
+
+void Program::LoadDetailsFromJSON(std::string json)
 {
 	std::stringstream jsonStream;
 	jsonStream << "{ \"root\": [" << json << "] }";
@@ -29,12 +35,18 @@ void Program::LoadFromJSON(std::string json)
 		catch (const boost::property_tree::ptree_bad_data &e)
 		{
 		}
+		catch (const boost::property_tree::ptree_bad_path &e)
+		{
+		}
 
 		try
 		{
 			SetHosts(val.second.get<std::string>("presentatie"));
 		}
 		catch (const boost::property_tree::ptree_bad_data &e)
+		{
+		}
+		catch (const boost::property_tree::ptree_bad_path &e)
 		{
 		}
 
@@ -45,6 +57,9 @@ void Program::LoadFromJSON(std::string json)
 		catch (const boost::property_tree::ptree_bad_data &e)
 		{
 		}
+		catch (const boost::property_tree::ptree_bad_path &e)
+		{
+		}
 
 		try
 		{
@@ -53,7 +68,12 @@ void Program::LoadFromJSON(std::string json)
 		catch (const boost::property_tree::ptree_bad_data &e)
 		{
 		}
+		catch (const boost::property_tree::ptree_bad_path &e)
+		{
+		}
 	}
+
+	m_detailsLoaded = true;
 }
 
 std::string Program::GetXML()
@@ -113,107 +133,112 @@ std::string Program::GetXML()
 
 Channel Program::GetChannel()
 {
-    return m_channel;
+	return m_channel;
+}
+
+bool Program::GetDetailsLoaded()
+{
+	return m_detailsLoaded;
 }
 
 void Program::SetId(int id)
 {
-    m_id = id;
+	m_id = id;
 }
 
 int Program::GetId()
 {
-    return m_id;
+	return m_id;
 }
 
 void Program::SetTitle(std::string title)
 {
-    m_title = title;
+	m_title = title;
 }
 
 std::string Program::GetTitle()
 {
-    return m_title;
+	return m_title;
 }
 
 void Program::SetGenre(std::string genre)
 {
-    m_genre = ConvertGenre(genre);
+	m_genre = ConvertGenre(genre);
 }
 
 std::string Program::GetGenre()
 {
-    return m_genre;
+	return m_genre;
 }
 
 void Program::SetType(std::string type)
 {
-    m_type = type;
+	m_type = type;
 }
 
 std::string Program::GetType()
 {
-    return m_type;
+	return m_type;
 }
 
 void Program::SetRating(std::string rating)
 {
-    m_rating = rating;
+	m_rating = rating;
 }
 
 std::string Program::GetRating()
 {
-    return m_rating;
+	return m_rating;
 }
 
 void Program::SetArticleId(int articleId)
 {
-    m_articleId = articleId;
+	m_articleId = articleId;
 }
 
 int Program::GetArticleId()
 {
-    return m_articleId;
+	return m_articleId;
 }
 
 void Program::SetArticleTitle(std::string articleTitle)
 {
-    m_articleTitle = articleTitle;
+	m_articleTitle = articleTitle;
 }
 
 std::string Program::GetArticleTitle()
 {
-    return m_articleTitle;
+	return m_articleTitle;
 }
 
 void Program::SetDateStart(std::string dateStart)
 {
-    m_dateStart = ConvertDate(dateStart);
+	m_dateStart = ConvertDate(dateStart);
 }
 
 std::string Program::GetDateStart()
 {
-    return m_dateStart;
+	return m_dateStart;
 }
 
 void Program::SetDateEnd(std::string dateEnd)
 {
-    m_dateEnd = ConvertDate(dateEnd);
+	m_dateEnd = ConvertDate(dateEnd);
 }
 
 std::string Program::GetDateEnd()
 {
-    return m_dateEnd;
+	return m_dateEnd;
 }
 
 void Program::SetSynopsis(std::string synopsis)
 {
-    m_synopsis = synopsis;
+	m_synopsis = synopsis;
 }
 
 std::string Program::GetSynopsis()
 {
-    return m_synopsis;
+	return m_synopsis;
 }
 
 void Program::SetHosts(std::string hosts)
@@ -228,22 +253,22 @@ std::string Program::GetHosts()
 
 void Program::SetActors(std::string actors)
 {
-    m_actors = actors;
+	m_actors = actors;
 }
 
 std::string Program::GetActors()
 {
-    return m_actors;
+	return m_actors;
 }
 
 void Program::SetDirector(std::string director)
 {
-    m_director = director;
+	m_director = director;
 }
 
 std::string Program::GetDirector()
 {
-    return m_director;
+	return m_director;
 }
 
 std::string Program::ConvertGenre(std::string genre)

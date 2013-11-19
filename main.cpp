@@ -15,6 +15,7 @@
 
 struct passwd *pw = getpwuid(getuid());
 std::string configFilename = std::string(pw->pw_dir) + "/.xmltv/fast_tv_grab_nl.conf";
+std::string cacheFilename = std::string(pw->pw_dir) + "/.xmltv/fast_tv_grab_nl.cache";
 
 void PrintHelp()
 {
@@ -35,7 +36,7 @@ void CreateConfig()
 	configFile.Write();
 }
 
-std::string GetXML(Configuration configuration, int days, bool fast, bool quiet)
+std::string GetXML(Configuration configuration, int days, bool fast, bool quiet, bool cache, std::string cacheFilename)
 {
 	std::stringstream ss;
 
@@ -45,7 +46,7 @@ std::string GetXML(Configuration configuration, int days, bool fast, bool quiet)
 
 	Channels channels = configuration.GetChannels();
 	ss << channels.GetXML();
-	ss << GetPrograms(channels, days, fast, quiet).GetXML();
+	ss << GetPrograms(channels, days, fast, quiet, cache, cacheFilename).GetXML();
 
 	ss << "</tv>" << std::endl;
 
@@ -72,6 +73,7 @@ int main(int argc, char** argv)
 	int days = 4;
 	bool fast = false;
 	bool quiet = false;
+	bool cache = true;
 
 	if (vm.count("days"))
 	{
@@ -109,7 +111,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	std::cout << GetXML(configuration, days, fast, quiet);
+	std::cout << GetXML(configuration, days, fast, quiet, cache, cacheFilename);
 
 	return 0;
 }

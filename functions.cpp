@@ -1,5 +1,8 @@
+#include <fstream>
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/regex.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 #include "functions.h"
 
 
@@ -14,11 +17,17 @@ Channels GetChannels()
 	return channels;
 }
 
-Programs GetPrograms(Channels channels, int days, bool fast, bool quiet)
+Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool cache, std::string cacheFilename)
 {
 	days = (days > 4)? 4: days;
 
 	Programs programs;
+	std::ifstream cacheInFile(cacheFilename.c_str());
+	if (cache && cacheInFile.good())
+	{
+		boost::archive::text_iarchive cacheInArchive(cacheInFile);
+		cacheInArchive >> programs;
+	}
 
 	for (Channels::iterator it = channels.begin(); it != channels.end(); ++it)
 	{
@@ -49,12 +58,17 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet)
 		int item = 0;
 		for (Programs::iterator it = programs.begin(); it != programs.end(); ++it, ++item)
 		{
-			HttpData httpData;
-			std::stringstream ss;
-			ss << "http://www.tvgids.nl/json/lists/program.php?id=" << it->GetId();
-			std::string programString = httpData.GetUrlContents(ss.str());
+			if (!it->GetDetailsLoaded())
+			{
+				std::cerr << it->GetId() << std::endl;
 
-			it->LoadFromJSON(programString);
+				HttpData httpData;
+				std::stringstream ss;
+				ss << "http://www.tvgids.nl/json/lists/program.php?id=" << it->GetId();
+				std::string programString = httpData.GetUrlContents(ss.str());
+
+				it->LoadDetailsFromJSON(programString);
+			}
 
 			if (!quiet)
 			{
@@ -67,6 +81,11 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet)
 			}
 		}
 	}
+
+	std::ofstream cacheOutFile(cacheFilename.c_str());
+	boost::archive::text_oarchive cacheOutArchive(cacheOutFile);
+
+	cacheOutArchive << programs;
 
 	return programs;
 }
