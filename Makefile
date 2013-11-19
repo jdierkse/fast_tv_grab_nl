@@ -41,4 +41,4 @@ clean:
 	-rm *.o fast_tv_grab_nl
 
 install: fast_tv_grab_nl
-	su -c"cp fast_tv_grab_nl /usr/bin"
+	cp fast_tv_grab_nl /usr/bin
