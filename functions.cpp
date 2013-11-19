@@ -60,8 +60,6 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool ca
 		{
 			if (!it->GetDetailsLoaded())
 			{
-				std::cerr << it->GetId() << std::endl;
-
 				HttpData httpData;
 				std::stringstream ss;
 				ss << "http://www.tvgids.nl/json/lists/program.php?id=" << it->GetId();
