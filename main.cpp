@@ -18,7 +18,7 @@ std::string configFilename = std::string(pw->pw_dir) + "/.xmltv/fast_tv_grab_nl.
 
 void PrintHelp()
 {
-	std::cout << "Usage: fast_tv_grabber_nl [options]" << std::endl;
+	std::cout << "Usage: fast_tv_grab_nl [options]" << std::endl;
 	std::cout << "Options:" << std::endl;
 	std::cout << "  --days N -d N   Number of days to grab" << std::endl;
 	std::cout << "  --fast -f       Don't grab detailed information" << std::endl;
@@ -41,7 +41,7 @@ std::string GetXML(Configuration configuration, int days, bool fast, bool quiet)
 
 	ss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
 	ss << "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">" << std::endl;
-	ss << "<tv generator-info-name=\"fast_tv_grabber_nl\">" << std::endl;
+	ss << "<tv generator-info-name=\"fast_tv_grab_nl\">" << std::endl;
 
 	Channels channels = configuration.GetChannels();
 	ss << channels.GetXML();
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 	if (!configuration.GetValid())
 	{
 		std::cout << "No config file present." << std::endl;
-		std::cout << "Run fast_tv_grabber_nl --createconfig to create a default config file." << std::endl;
+		std::cout << "Run fast_tv_grab_nl --createconfig to create a default config file." << std::endl;
 		return -1;
 	}
 
