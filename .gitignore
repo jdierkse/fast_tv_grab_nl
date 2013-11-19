@@ -11,3 +11,6 @@
 *.lai
 *.la
 *.a
+
+# Resulting executable file
+fast_tv_grab_nl

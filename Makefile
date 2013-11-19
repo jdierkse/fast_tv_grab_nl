@@ -1,5 +1,5 @@
 CFLAGS := 
-LFLAGS := -lboost_program_options -lboost_regex
+LFLAGS := -lboost_program_options -lboost_regex -lboost_system -lboost_filesystem
 
 ifeq ($(BUILD),debug)   
 CFLAGS += -O0 -g

@@ -14,7 +14,7 @@
 
 
 struct passwd *pw = getpwuid(getuid());
-std::string configFilename = std::string(pw->pw_dir) + "/.xmltv/fast_tv_grabber_nl.conf";
+std::string configFilename = std::string(pw->pw_dir) + "/.xmltv/fast_tv_grab_nl.conf";
 
 void PrintHelp()
 {

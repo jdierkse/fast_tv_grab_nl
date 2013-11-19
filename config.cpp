@@ -1,5 +1,6 @@
 #include <fstream>
 #include <map>
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include "functions.h"
@@ -83,6 +84,10 @@ Configuration ConfigurationFile::Read()
 
 void ConfigurationFile::Write()
 {
+	boost::filesystem::path fullpath(m_filename);
+	boost::filesystem::path directory = fullpath.parent_path();
+	boost::filesystem::create_directories(directory);
+
 	std::ofstream file(m_filename.c_str());
 	Channels channels = m_configuration.GetChannels();
 	for (Channels::iterator it = channels.begin(); it != channels.end(); ++it)
