@@ -31,6 +31,7 @@ Create config file: (edit config file, and remove unwanted channels):
 ~~~~
 ./fast_tv_grab_nl --createconfig
 ~~~~
+The config file can be found in ~/.xmltv/fast_tv_grab_nl.conf  
 Grab channel info and feed into TVHeadend:
 ~~~~
 /fast_tv_grab_nl --quiet | socat - UNIX:/usr/local/tvheadend/var/epggrab/xmltv.sock
