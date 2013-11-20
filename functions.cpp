@@ -52,6 +52,7 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool ca
 		{
 			total = programs.size();
 			std::cerr << "Fetching detailed info for " << total << " items:" << std::endl;
+			std::cerr << " 0%";
 		}
 
 		int percent = 0;
@@ -73,11 +74,22 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool ca
 				int p = (double)item / total * 100;
 				if (p != percent)
 				{
-					std::cerr << p << "%" << std::endl;
+					std::cerr << '\b' << '\b' << '\b';
+
+					if (p < 10)
+						std::cerr << " ";
+
+					std::cerr << p << "%";
 					percent = p;
 				}
 			}
 		}
+	}
+
+	if (!quiet)
+	{
+		std::cerr << '\b' << '\b' << '\b';
+		std::cerr << "100%" << std::endl;
 	}
 
 	std::ofstream cacheOutFile(cacheFilename.c_str());
