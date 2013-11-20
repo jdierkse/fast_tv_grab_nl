@@ -19,6 +19,31 @@ Channels GetChannels()
 	return channels;
 }
 
+int OutputProgress(int currentItem, int totalItems, int previousPercentage)
+{
+	if (currentItem == 0)
+	{
+		std::cerr << " 0%";
+		return 0;
+	}
+
+	int currentPercentage = (double)currentItem / totalItems * 100;
+	if (currentPercentage != previousPercentage)
+	{
+		std::cerr << '\b' << '\b' << '\b';
+
+		if (currentPercentage < 10)
+			std::cerr << " ";
+
+		std::cerr << currentPercentage << "%";
+	}
+
+	if (currentItem == totalItems)
+		std::cerr << std::endl;
+
+	return currentPercentage;
+}
+
 Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool cache, std::string cacheFilename)
 {
 	days = (days > 4)? 4: days;
@@ -34,13 +59,17 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool ca
 		}
 	}
 
+	int total = channels.size();
+	int percent = 0;
+	int item = 0;
+
 	if (!quiet)
 		std::cerr << "Fetching basic information for " << channels.size() << " channels:" << std::endl;
 
-	for (Channels::iterator it = channels.begin(); it != channels.end(); ++it)
+	for (Channels::iterator it = channels.begin(); it != channels.end(); ++it, ++item)
 	{
 		if (!quiet)
-			std::cerr << it->GetName() << std::endl;
+			OutputProgress(item, total, percent);
 
 		for (int day = 1; day <= days; ++day)
 		{
@@ -52,6 +81,9 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool ca
 			programs.LoadFromJSON(*it, programsString);
 		}
 	}
+
+	if (!quiet)
+		OutputProgress(item, total, percent);
 
 	if (cache)
 	{
@@ -66,55 +98,37 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool ca
 		int total = deleteList.size();
 		if (total > 0)
 		{
-			if (!quiet)
-			{
-				std::cerr << "Removing " << total << " old items from cache" << std::endl;
-				std::cerr << " 0%";
-			}
-	
-			// TODO: make function
 			int percent = 0;
 			int item = 0;
+
+			if (!quiet)
+				std::cerr << "Removing " << total << " old items from cache" << std::endl;
+	
 			for (std::vector<Program>::iterator it = deleteList.begin(); it != deleteList.end(); ++it, ++item)
 			{
 				programs.Remove(*it);
 
 				if (!quiet)
-				{
-					int p = (double)item / total * 100;
-					if (p != percent)
-					{
-						std::cerr << '\b' << '\b' << '\b';
-
-						if (p < 10)
-							std::cerr << " ";
-
-						std::cerr << p << "%";
-						percent = p;
-					}
-				}
+					OutputProgress(item, total, percent);
 			}
 
 			if (!quiet)
-			{
-				std::cerr << '\b' << '\b' << '\b';
-				std::cerr << "100%" << std::endl;
-			}
+				OutputProgress(item, total, percent);
 		}
 	}
 
 	if (!fast)
 	{
 		int total = 0;
+		int percent = 0;
+		int item = 0;
+
 		if (!quiet)
 		{
 			total = programs.size();
 			std::cerr << "Fetching detailed info for " << total << " items:" << std::endl;
-			std::cerr << " 0%";
 		}
 
-		int percent = 0;
-		int item = 0;
 		for (Programs::iterator it = programs.begin(); it != programs.end(); ++it, ++item)
 		{
 			if (!it->GetDetailsLoaded())
@@ -127,29 +141,13 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool ca
 				it->LoadDetailsFromJSON(programString);
 			}
 
-			// TODO: make function
 			if (!quiet)
-			{
-				int p = (double)item / total * 100;
-				if (p != percent)
-				{
-					std::cerr << '\b' << '\b' << '\b';
-
-					if (p < 10)
-						std::cerr << " ";
-
-					std::cerr << p << "%";
-					percent = p;
-				}
-			}
+				OutputProgress(item, total, percent);
 		}
 	}
 
 	if (!quiet)
-	{
-		std::cerr << '\b' << '\b' << '\b';
-		std::cerr << "100%" << std::endl;
-	}
+		OutputProgress(item, total, percent);
 
 	std::sort(programs.begin(), programs.end());
 
