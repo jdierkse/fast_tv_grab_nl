@@ -1,6 +1,6 @@
 CC := g++
 CFLAGS := 
-LFLAGS := -lboost_program_options -lboost_regex -lboost_system -lboost_filesystem -lboost_serialization
+LFLAGS := -lboost_program_options -lboost_regex -lboost_system -lboost_filesystem -lboost_serialization -lboost_date_time
 
 ifeq ($(BUILD),debug)
 # Debug flags

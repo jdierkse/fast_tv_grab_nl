@@ -8,14 +8,17 @@
 class Channel
 {
 public:
-	std::string GetXML();
+	bool operator==(int value) const;
+	bool operator<(const Channel& other) const;
+
+	std::string GetXML() const;
 
 	void SetId(int id);
-	int GetId();
+	int GetId() const;
 	void SetName(std::string name);
-	std::string GetName();
+	std::string GetName() const;
 	void SetNameShort(std::string nameShort);
-	std::string GetNameShort();
+	std::string GetNameShort() const;
 
 private:
 	friend class boost::serialization::access;

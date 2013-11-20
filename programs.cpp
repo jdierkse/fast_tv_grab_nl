@@ -63,16 +63,32 @@ void Programs::LoadFromJSON(Channel channel, std::string json)
 	}
 }
 
-std::string Programs::GetXML()
+std::string Programs::GetXML() const
 {
 	std::stringstream ss;
-	for (iterator it = begin(); it != end(); ++it)
+	for (const_iterator it = begin(); it != end(); ++it)
 		ss << it->GetXML();
 
 	return ss.str();
 }
 
+bool Programs::Remove(Program program)
+{
+	Programs::iterator it = std::find(m_programs.begin(), m_programs.end(), program.GetId());
+	if (it != m_programs.end())
+	{
+		m_programs.erase(it);
+		return true;
+	}
+	return false;
+}
+
 Programs::iterator Programs::begin()
+{
+	return m_programs.begin();
+}
+
+Programs::const_iterator Programs::begin() const
 {
 	return m_programs.begin();
 }
@@ -82,7 +98,17 @@ Programs::iterator Programs::end()
 	return m_programs.end();
 }
 
+Programs::const_iterator Programs::end() const
+{
+	return m_programs.end();
+}
+
 Programs::reverse_iterator Programs::rbegin()
+{
+	return m_programs.rbegin();
+}
+
+Programs::const_reverse_iterator Programs::rbegin() const
 {
 	return m_programs.rbegin();
 }
@@ -92,7 +118,12 @@ Programs::reverse_iterator Programs::rend()
 	return m_programs.rend();
 }
 
-size_t Programs::size()
+Programs::const_reverse_iterator Programs::rend() const
+{
+	return m_programs.rend();
+}
+
+size_t Programs::size() const
 {
 	return m_programs.size();
 }

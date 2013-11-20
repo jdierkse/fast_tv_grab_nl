@@ -1,8 +1,17 @@
 #include <sstream>
 #include "channel.h"
 
+bool Channel::operator==(int value) const
+{
+	return m_id == value;
+}
 
-std::string Channel::GetXML()
+bool Channel::operator<(const Channel& other) const
+{
+	return (m_id < other.GetId());
+}
+
+std::string Channel::GetXML() const
 {
 	std::stringstream ss;
 
@@ -18,7 +27,7 @@ void Channel::SetId(int id)
 	m_id = id;
 }
 
-int Channel::GetId()
+int Channel::GetId() const
 {
 	return m_id;
 }
@@ -28,7 +37,7 @@ void Channel::SetName(std::string name)
 	m_name = name;
 }
 
-std::string Channel::GetName()
+std::string Channel::GetName() const
 {
 	return m_name;
 }
@@ -38,7 +47,7 @@ void Channel::SetNameShort(std::string nameShort)
 	m_nameShort = nameShort;
 }
 
-std::string Channel::GetNameShort()
+std::string Channel::GetNameShort() const
 {
 	return m_nameShort;
 }

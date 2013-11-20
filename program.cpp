@@ -18,6 +18,16 @@ Program::Program(Channel channel) :
 {
 }
 
+bool Program::operator==(const int& value) const
+{
+	return m_id == value;
+}
+
+bool Program::operator<(const Program& other) const
+{
+	return (m_id < other.GetId());
+}
+
 void Program::LoadDetailsFromJSON(std::string json)
 {
 	std::stringstream jsonStream;
@@ -76,7 +86,7 @@ void Program::LoadDetailsFromJSON(std::string json)
 	m_detailsLoaded = true;
 }
 
-std::string Program::GetXML()
+std::string Program::GetXML() const
 {
 	std::stringstream ss;
 	ss << "  <programme start=\"" << m_dateStart << "\" stop=\"" << m_dateEnd << "\" channel=\"" << m_channel.GetId() << "\">" << std::endl;
@@ -131,12 +141,12 @@ std::string Program::GetXML()
 	return ss.str();
 }
 
-Channel Program::GetChannel()
+Channel Program::GetChannel() const
 {
 	return m_channel;
 }
 
-bool Program::GetDetailsLoaded()
+bool Program::GetDetailsLoaded() const
 {
 	return m_detailsLoaded;
 }
@@ -146,7 +156,7 @@ void Program::SetId(int id)
 	m_id = id;
 }
 
-int Program::GetId()
+int Program::GetId() const
 {
 	return m_id;
 }
@@ -156,7 +166,7 @@ void Program::SetTitle(std::string title)
 	m_title = title;
 }
 
-std::string Program::GetTitle()
+std::string Program::GetTitle() const
 {
 	return m_title;
 }
@@ -166,7 +176,7 @@ void Program::SetGenre(std::string genre)
 	m_genre = ConvertGenre(genre);
 }
 
-std::string Program::GetGenre()
+std::string Program::GetGenre() const
 {
 	return m_genre;
 }
@@ -176,7 +186,7 @@ void Program::SetType(std::string type)
 	m_type = type;
 }
 
-std::string Program::GetType()
+std::string Program::GetType() const
 {
 	return m_type;
 }
@@ -186,7 +196,7 @@ void Program::SetRating(std::string rating)
 	m_rating = rating;
 }
 
-std::string Program::GetRating()
+std::string Program::GetRating() const
 {
 	return m_rating;
 }
@@ -196,7 +206,7 @@ void Program::SetArticleId(int articleId)
 	m_articleId = articleId;
 }
 
-int Program::GetArticleId()
+int Program::GetArticleId() const
 {
 	return m_articleId;
 }
@@ -206,7 +216,7 @@ void Program::SetArticleTitle(std::string articleTitle)
 	m_articleTitle = articleTitle;
 }
 
-std::string Program::GetArticleTitle()
+std::string Program::GetArticleTitle() const
 {
 	return m_articleTitle;
 }
@@ -216,7 +226,7 @@ void Program::SetDateStart(std::string dateStart)
 	m_dateStart = ConvertDate(dateStart);
 }
 
-std::string Program::GetDateStart()
+std::string Program::GetDateStart() const
 {
 	return m_dateStart;
 }
@@ -226,7 +236,7 @@ void Program::SetDateEnd(std::string dateEnd)
 	m_dateEnd = ConvertDate(dateEnd);
 }
 
-std::string Program::GetDateEnd()
+std::string Program::GetDateEnd() const
 {
 	return m_dateEnd;
 }
@@ -236,7 +246,7 @@ void Program::SetSynopsis(std::string synopsis)
 	m_synopsis = synopsis;
 }
 
-std::string Program::GetSynopsis()
+std::string Program::GetSynopsis() const
 {
 	return m_synopsis;
 }
@@ -246,7 +256,7 @@ void Program::SetHosts(std::string hosts)
 	m_hosts = hosts;
 }
 
-std::string Program::GetHosts()
+std::string Program::GetHosts() const
 {
 	return m_hosts;
 }
@@ -256,7 +266,7 @@ void Program::SetActors(std::string actors)
 	m_actors = actors;
 }
 
-std::string Program::GetActors()
+std::string Program::GetActors() const
 {
 	return m_actors;
 }
@@ -266,7 +276,7 @@ void Program::SetDirector(std::string director)
 	m_director = director;
 }
 
-std::string Program::GetDirector()
+std::string Program::GetDirector() const
 {
 	return m_director;
 }

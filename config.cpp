@@ -19,12 +19,12 @@ Configuration::Configuration() :
 {
 }
 
-bool Configuration::GetValid()
+bool Configuration::GetValid() const
 {
 	return m_valid;
 }
 
-Channels Configuration::GetChannels()
+Channels Configuration::GetChannels() const
 {
 	return m_channels;
 }

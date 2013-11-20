@@ -21,8 +21,9 @@ void PrintHelp()
 {
 	std::cout << "Usage: fast_tv_grab_nl [options]" << std::endl;
 	std::cout << "Options:" << std::endl;
-	std::cout << "  --days N -d N   Number of days to grab" << std::endl;
+	std::cout << "  --days N -d N   Number of days to grab (default: 4)" << std::endl;
 	std::cout << "  --fast -f       Don't grab detailed information" << std::endl;
+	std::cout << "  --nocache -n    Don't use caching" << std::endl;
 	std::cout << "  --quiet -q      Supress progress output" << std::endl;
 	std::cout << "  --createconfig  Create the configuration file" << std::endl;
 	std::cout << "  --help -h       Print this help information" << std::endl;
@@ -60,6 +61,7 @@ int main(int argc, char** argv)
 	description.add_options()
 		("days,d", boost::program_options::value<int>(), "Number of days to grab")
 		("fast,f", "Don't grab detailed information")
+		("nocache,n", "Don't use caching")
 		("quiet,q", "Supress progress output")
 		("createconfig", "Create the configuration file")
 		("help,h", "Print this help information");
@@ -67,9 +69,6 @@ int main(int argc, char** argv)
 	boost::program_options::variables_map vm;
 	boost::program_options::store(boost::program_options::parse_command_line(argc, argv, description), vm);
 
-	// TODO: Caching
-	// 	 Remove old data
-	// 	 Handle new channel / removed channel
 	// TODO: Multithreading
 
 	int days = 4;
@@ -85,6 +84,11 @@ int main(int argc, char** argv)
 	if (vm.count("fast"))
 	{
 		fast = true;
+	}
+
+	if (vm.count("nocache"))
+	{
+		cache = false;
 	}
 
 	if (vm.count("quiet"))

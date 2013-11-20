@@ -12,46 +12,44 @@ class Program
 public:
 	Program(Channel channel);
 
-	bool operator ==(const int& value)
-	{
-		return m_id == value;
-	}
+	bool operator==(const int& value) const;
+	bool operator<(const Program& other) const;
 
 	void LoadDetailsFromJSON(std::string json);
-	std::string GetXML();
+	std::string GetXML() const;
 
-	Channel GetChannel();
-	bool GetDetailsLoaded();
+	Channel GetChannel() const;
+	bool GetDetailsLoaded() const;
 
 	void SetId(int id);
-	int GetId();
+	int GetId() const;
 	void SetTitle(std::string title);
-	std::string GetTitle();
+	std::string GetTitle() const;
 	void SetGenre(std::string genre);
-	std::string GetGenre();
+	std::string GetGenre() const;
 	void SetType(std::string type);
-	std::string GetType();
+	std::string GetType() const;
 	void SetRating(std::string rating);
-	std::string GetRating();
+	std::string GetRating() const;
 
 	void SetArticleId(int articleId);
-	int GetArticleId();
+	int GetArticleId() const;
 	void SetArticleTitle(std::string articleTitle);
-	std::string GetArticleTitle();
+	std::string GetArticleTitle() const;
 
 	void SetDateStart(std::string dateStart);
-	std::string GetDateStart();
+	std::string GetDateStart() const;
 	void SetDateEnd(std::string dateEnd);
-	std::string GetDateEnd();
+	std::string GetDateEnd() const;
 
 	void SetSynopsis(std::string synopsis);
-	std::string GetSynopsis();
+	std::string GetSynopsis() const;
 	void SetHosts(std::string hosts);
-	std::string GetHosts();
+	std::string GetHosts() const;
 	void SetActors(std::string actors);
-	std::string GetActors();
+	std::string GetActors() const;
 	void SetDirector(std::string director);
-	std::string GetDirector();
+	std::string GetDirector() const;
 
 private:
 	Program();

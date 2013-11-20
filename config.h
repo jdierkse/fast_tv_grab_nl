@@ -11,8 +11,8 @@ public:
 	friend class ConfigurationFile;
 	Configuration();
 
-	bool GetValid();
-	Channels GetChannels();
+	bool GetValid() const;
+	Channels GetChannels() const;
 
 protected:
 	void SetValid(bool valid);

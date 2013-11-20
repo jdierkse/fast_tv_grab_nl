@@ -16,9 +16,11 @@ The current Makefile is created for compilation on a bootstrapped Synology DS181
 
 Dependencies:
 * boost-dev
+* boost-date-time
 * boost-filesystem
 * boost-program-options
 * boost-regex
+* boost-serialization
 * boost-system
 * libcurl-dev
 
