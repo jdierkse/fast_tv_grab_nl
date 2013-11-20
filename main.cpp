@@ -68,6 +68,8 @@ int main(int argc, char** argv)
 	boost::program_options::store(boost::program_options::parse_command_line(argc, argv, description), vm);
 
 	// TODO: Caching
+	// 	 Remove old data
+	// 	 Handle new channel / removed channel
 	// TODO: Multithreading
 
 	int days = 4;
