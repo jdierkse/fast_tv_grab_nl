@@ -128,6 +128,7 @@ std::string Program::GetXML() const
 			for (std::vector<std::string>::iterator it = presenters.begin(); it != presenters.end(); ++it)
 				ss << "      <presenter>" << *it << "</presenter>" << std::endl;
 		}
+
 		ss << "    </credits>" << std::endl;
 	}
 
@@ -163,7 +164,7 @@ int Program::GetId() const
 
 void Program::SetTitle(std::string title)
 {
-	m_title = title;
+	m_title = RemoveSpecialCharacters(title);
 }
 
 std::string Program::GetTitle() const
@@ -183,7 +184,7 @@ std::string Program::GetGenre() const
 
 void Program::SetType(std::string type)
 {
-	m_type = type;
+	m_type = RemoveSpecialCharacters(type);
 }
 
 std::string Program::GetType() const
@@ -193,7 +194,7 @@ std::string Program::GetType() const
 
 void Program::SetRating(std::string rating)
 {
-	m_rating = rating;
+	m_rating = RemoveSpecialCharacters(rating);
 }
 
 std::string Program::GetRating() const
@@ -213,7 +214,7 @@ int Program::GetArticleId() const
 
 void Program::SetArticleTitle(std::string articleTitle)
 {
-	m_articleTitle = articleTitle;
+	m_articleTitle = RemoveSpecialCharacters(articleTitle);
 }
 
 std::string Program::GetArticleTitle() const
@@ -243,7 +244,7 @@ std::string Program::GetDateEnd() const
 
 void Program::SetSynopsis(std::string synopsis)
 {
-	m_synopsis = synopsis;
+	m_synopsis = RemoveSpecialCharacters(synopsis);
 }
 
 std::string Program::GetSynopsis() const
@@ -253,7 +254,7 @@ std::string Program::GetSynopsis() const
 
 void Program::SetHosts(std::string hosts)
 {
-	m_hosts = hosts;
+	m_hosts = RemoveSpecialCharacters(hosts);
 }
 
 std::string Program::GetHosts() const
@@ -263,7 +264,7 @@ std::string Program::GetHosts() const
 
 void Program::SetActors(std::string actors)
 {
-	m_actors = actors;
+	m_actors = RemoveSpecialCharacters(actors);
 }
 
 std::string Program::GetActors() const
@@ -273,7 +274,7 @@ std::string Program::GetActors() const
 
 void Program::SetDirector(std::string director)
 {
-	m_director = director;
+	m_director = RemoveSpecialCharacters(director);
 }
 
 std::string Program::GetDirector() const
@@ -321,5 +322,13 @@ std::string Program::ConvertDate(std::string date)
 	ss << boost::regex_replace(date, boost::regex("[-: ]"), "") << " +0100";
 
 	return ss.str();
+}
+
+std::string Program::RemoveSpecialCharacters(std::string string)
+{
+	string = boost::regex_replace(string, boost::regex("<[a-zA-Z1-9\\/ ]*>"), "");
+	string = boost::regex_replace(string, boost::regex("\r"), "");
+	string = boost::regex_replace(string, boost::regex("&"), "&amp;");
+	return string;
 }
 
