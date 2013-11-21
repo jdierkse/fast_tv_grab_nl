@@ -23,16 +23,18 @@ int OutputProgress(int currentItem, int totalItems, int previousPercentage)
 {
 	if (currentItem == 0)
 	{
-		std::cerr << " 0%";
+		std::cerr << "  0%";
 		return 0;
 	}
 
 	int currentPercentage = (double)currentItem / totalItems * 100;
 	if (currentPercentage != previousPercentage)
 	{
-		std::cerr << '\b' << '\b' << '\b';
+		std::cerr << '\b' << '\b' << '\b' << '\b';
 
 		if (currentPercentage < 10)
+			std::cerr << "  ";
+		else if (currentPercentage < 100)
 			std::cerr << " ";
 
 		std::cerr << currentPercentage << "%";
@@ -54,8 +56,15 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool ca
 		std::ifstream cacheInFile(cacheFilename.c_str());
 		if (cacheInFile.good())
 		{
-			boost::archive::text_iarchive cacheInArchive(cacheInFile);
-			cacheInArchive >> programs;
+			try
+			{
+				boost::archive::text_iarchive cacheInArchive(cacheInFile);
+				cacheInArchive >> programs;
+			}
+			catch (const boost::archive::archive_exception&)
+			{
+				programs = Programs();
+			}
 		}
 	}
 
@@ -102,7 +111,7 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool ca
 			int item = 0;
 
 			if (!quiet)
-				std::cerr << "Removing " << total << " old items from cache" << std::endl;
+				std::cerr << "Removing " << total << " old programmes from cache" << std::endl;
 	
 			for (std::vector<Program>::iterator it = deleteList.begin(); it != deleteList.end(); ++it, ++item)
 			{
@@ -126,7 +135,7 @@ Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool ca
 		if (!quiet)
 		{
 			total = programs.size();
-			std::cerr << "Fetching detailed info for " << total << " items:" << std::endl;
+			std::cerr << "Fetching detailed info for " << total << " programmes:" << std::endl;
 		}
 
 		for (Programs::iterator it = programs.begin(); it != programs.end(); ++it, ++item)
@@ -169,5 +178,12 @@ std::vector<std::string> SplitString(std::string string, std::string delimiter)
 	std::vector<std::string> strings;
 	boost::algorithm::split_regex(strings, string, boost::regex(delimiter));
 	return strings;
+}
+std::string FixHTMLAndSpecialCharacters(std::string string)
+{
+	string = boost::regex_replace(string, boost::regex("<[a-zA-Z1-9\\/ ]*>"), "");
+	string = boost::regex_replace(string, boost::regex("\r"), "");
+	string = boost::regex_replace(string, boost::regex("&"), "&amp;");
+	return string;
 }
 

@@ -1,4 +1,5 @@
 #include <sstream>
+#include "functions.h"
 #include "channel.h"
 
 bool Channel::operator==(int value) const
@@ -34,7 +35,7 @@ int Channel::GetId() const
 
 void Channel::SetName(std::string name)
 {
-	m_name = name;
+	m_name = FixHTMLAndSpecialCharacters(name);
 }
 
 std::string Channel::GetName() const
@@ -44,7 +45,7 @@ std::string Channel::GetName() const
 
 void Channel::SetNameShort(std::string nameShort)
 {
-	m_nameShort = nameShort;
+	m_nameShort = FixHTMLAndSpecialCharacters(nameShort);
 }
 
 std::string Channel::GetNameShort() const

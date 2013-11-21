@@ -164,7 +164,7 @@ int Program::GetId() const
 
 void Program::SetTitle(std::string title)
 {
-	m_title = RemoveSpecialCharacters(title);
+	m_title = FixHTMLAndSpecialCharacters(title);
 }
 
 std::string Program::GetTitle() const
@@ -184,7 +184,7 @@ std::string Program::GetGenre() const
 
 void Program::SetType(std::string type)
 {
-	m_type = RemoveSpecialCharacters(type);
+	m_type = FixHTMLAndSpecialCharacters(type);
 }
 
 std::string Program::GetType() const
@@ -194,7 +194,7 @@ std::string Program::GetType() const
 
 void Program::SetRating(std::string rating)
 {
-	m_rating = RemoveSpecialCharacters(rating);
+	m_rating = FixHTMLAndSpecialCharacters(rating);
 }
 
 std::string Program::GetRating() const
@@ -214,7 +214,7 @@ int Program::GetArticleId() const
 
 void Program::SetArticleTitle(std::string articleTitle)
 {
-	m_articleTitle = RemoveSpecialCharacters(articleTitle);
+	m_articleTitle = FixHTMLAndSpecialCharacters(articleTitle);
 }
 
 std::string Program::GetArticleTitle() const
@@ -244,7 +244,7 @@ std::string Program::GetDateEnd() const
 
 void Program::SetSynopsis(std::string synopsis)
 {
-	m_synopsis = RemoveSpecialCharacters(synopsis);
+	m_synopsis = FixHTMLAndSpecialCharacters(synopsis);
 }
 
 std::string Program::GetSynopsis() const
@@ -254,7 +254,7 @@ std::string Program::GetSynopsis() const
 
 void Program::SetHosts(std::string hosts)
 {
-	m_hosts = RemoveSpecialCharacters(hosts);
+	m_hosts = FixHTMLAndSpecialCharacters(hosts);
 }
 
 std::string Program::GetHosts() const
@@ -264,7 +264,7 @@ std::string Program::GetHosts() const
 
 void Program::SetActors(std::string actors)
 {
-	m_actors = RemoveSpecialCharacters(actors);
+	m_actors = FixHTMLAndSpecialCharacters(actors);
 }
 
 std::string Program::GetActors() const
@@ -274,7 +274,7 @@ std::string Program::GetActors() const
 
 void Program::SetDirector(std::string director)
 {
-	m_director = RemoveSpecialCharacters(director);
+	m_director = FixHTMLAndSpecialCharacters(director);
 }
 
 std::string Program::GetDirector() const
@@ -290,7 +290,7 @@ std::string Program::ConvertGenre(std::string genre)
 		return "Show / Game show";
 	if (genre == "Animatie" || genre == "Jeugd")
 		return "Children's / Youth programmes";
-	if (genre == "Serie/Soap" || genre == "Film" ||
+	if (genre == "Serie/soap" || genre == "Film" ||
 	    genre == "Komedie" || genre == "Actiefilm" ||
 	    genre == "Tekenfilm" || genre == "Animatiekomedie" ||
 	    genre == "Thriller" || genre == "Familiekomedie" ||
@@ -309,9 +309,9 @@ std::string Program::ConvertGenre(std::string genre)
 		return "Music / Ballet / Dance";
 	if (genre == "Religieus")
 		return "Social / Political issues / Economics";
-	if (genre == "Kunst/Cultuur" || genre == "Cultuur")
-		return "Art / Culture";
-	if (genre == "Overig")
+	if (genre == "Kunst/Cultuur" || genre == "Kunst/cultuur" || genre == "Cultuur")
+		return "Arts / Culture (without music)";
+	if (genre == "Overig" || genre == "Overige")
 		return "Other";
 	return genre;
 }
@@ -322,13 +322,5 @@ std::string Program::ConvertDate(std::string date)
 	ss << boost::regex_replace(date, boost::regex("[-: ]"), "") << " +0100";
 
 	return ss.str();
-}
-
-std::string Program::RemoveSpecialCharacters(std::string string)
-{
-	string = boost::regex_replace(string, boost::regex("<[a-zA-Z1-9\\/ ]*>"), "");
-	string = boost::regex_replace(string, boost::regex("\r"), "");
-	string = boost::regex_replace(string, boost::regex("&"), "&amp;");
-	return string;
 }
 

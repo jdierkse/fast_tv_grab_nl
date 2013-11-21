@@ -20,7 +20,7 @@ fast_tv_grab_nl: main.cpp httpdata.o channel.o channels.o config.o program.o pro
 
 httpdata.o: httpdata.cpp httpdata.h
 
-channel.o: channel.cpp channel.h
+channel.o: channel.cpp channel.h functions.h
 
 channels.o: channels.cpp channels.h channel.h
 

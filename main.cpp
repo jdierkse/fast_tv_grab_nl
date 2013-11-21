@@ -25,8 +25,14 @@ void PrintHelp()
 	std::cout << "  --fast -f       Don't grab detailed information" << std::endl;
 	std::cout << "  --nocache -n    Don't use caching" << std::endl;
 	std::cout << "  --quiet -q      Supress progress output" << std::endl;
+	std::cout << "  --clearcache    Clear the cache file" << std::endl;
 	std::cout << "  --createconfig  Create the configuration file" << std::endl;
 	std::cout << "  --help -h       Print this help information" << std::endl;
+}
+
+void ClearCache()
+{
+	std::ofstream cacheOutFile(cacheFilename.c_str());
 }
 
 void CreateConfig()
@@ -63,6 +69,7 @@ int main(int argc, char** argv)
 		("fast,f", "Don't grab detailed information")
 		("nocache,n", "Don't use caching")
 		("quiet,q", "Supress progress output")
+		("clearcache", "Clear the cache file")
 		("createconfig", "Create the configuration file")
 		("help,h", "Print this help information");
 
@@ -94,6 +101,12 @@ int main(int argc, char** argv)
 	if (vm.count("quiet"))
 	{
 		quiet = true;
+	}
+
+	if (vm.count("clearcache"))
+	{
+		ClearCache();
+		return 0;
 	}
 
 	if (vm.count("createconfig"))

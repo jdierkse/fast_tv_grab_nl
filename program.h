@@ -79,7 +79,6 @@ private:
 private:
 	std::string ConvertGenre(std::string genre);
 	std::string ConvertDate(std::string date);
-	std::string RemoveSpecialCharacters(std::string string);
 
 private:
 	Channel m_channel;
