@@ -38,49 +38,21 @@ void Program::LoadDetailsFromJSON(std::string json)
 
 	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child("root"))
 	{
-		try
-		{
-			SetSynopsis(val.second.get<std::string>("synop"));
-		}
-		catch (const boost::property_tree::ptree_bad_data &e)
-		{
-		}
-		catch (const boost::property_tree::ptree_bad_path &e)
-		{
-		}
+		boost::optional<std::string> synopsis = val.second.get_optional<std::string>("synop");
+		if (synopsis.is_initialized())
+			SetSynopsis(synopsis.get());
 
-		try
-		{
-			SetHosts(val.second.get<std::string>("presentatie"));
-		}
-		catch (const boost::property_tree::ptree_bad_data &e)
-		{
-		}
-		catch (const boost::property_tree::ptree_bad_path &e)
-		{
-		}
+		boost::optional<std::string> hosts = val.second.get_optional<std::string>("presentatie");
+		if (hosts.is_initialized())
+			SetHosts(hosts.get());
 
-		try
-		{
-			SetActors(val.second.get<std::string>("acteursnamen_rolverdeling"));
-		}
-		catch (const boost::property_tree::ptree_bad_data &e)
-		{
-		}
-		catch (const boost::property_tree::ptree_bad_path &e)
-		{
-		}
+		boost::optional<std::string> actors = val.second.get_optional<std::string>("acteursnamen_rolverdeling");
+		if (actors.is_initialized())
+			SetActors(actors.get());
 
-		try
-		{
-			SetDirector(val.second.get<std::string>("regisseur"));
-		}
-		catch (const boost::property_tree::ptree_bad_data &e)
-		{
-		}
-		catch (const boost::property_tree::ptree_bad_path &e)
-		{
-		}
+		boost::optional<std::string> director = val.second.get_optional<std::string>("regisseur");
+		if (director.is_initialized())
+			SetDirector(director.get());
 	}
 
 	m_detailsLoaded = true;

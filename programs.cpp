@@ -19,47 +19,27 @@ void Programs::LoadFromJSON(Channel channel, std::string json)
 	{
 		Program program(channel);
 
-		try
-		{
-			program.SetId(val.second.get<int>("db_id"));
+		program.SetId(val.second.get<int>("db_id"));
 
-			if (std::find(m_programs.begin(), m_programs.end(), program.GetId()) != m_programs.end())
-				continue;
+		if (std::find(m_programs.begin(), m_programs.end(), program.GetId()) != m_programs.end())
+			continue;
 
-			program.SetTitle(val.second.get<std::string>("titel"));
-			program.SetType(val.second.get<std::string>("soort"));
-			program.SetGenre(val.second.get<std::string>("genre"));
-			program.SetRating(val.second.get<std::string>("kijkwijzer"));
-			program.SetDateStart(val.second.get<std::string>("datum_start"));
-			program.SetDateEnd(val.second.get<std::string>("datum_end"));
+		program.SetTitle(val.second.get<std::string>("titel"));
+		program.SetType(val.second.get<std::string>("soort"));
+		program.SetGenre(val.second.get<std::string>("genre"));
+		program.SetRating(val.second.get<std::string>("kijkwijzer"));
+		program.SetDateStart(val.second.get<std::string>("datum_start"));
+		program.SetDateEnd(val.second.get<std::string>("datum_end"));
 
-			try
-			{
-				program.SetArticleId(val.second.get<int>("artikel_id"));
-			}
-			catch (const boost::property_tree::ptree_bad_data &e)
-			{
-			}
-			catch (const boost::property_tree::ptree_bad_path &e)
-			{
-			}
+		boost::optional<int> articleId = val.second.get_optional<int>("artikel_id");
+		if (articleId.is_initialized())
+			program.SetArticleId(articleId.get());
 			
-			try
-			{
-				program.SetArticleTitle(val.second.get<std::string>("artikel_titel"));
-			}
-			catch (const boost::property_tree::ptree_bad_data &e)
-			{
-			}
-			catch (const boost::property_tree::ptree_bad_path &e)
-			{
-			}
+		boost::optional<std::string> articleTitle = val.second.get_optional<std::string>("artikel_titel");
+		if (articleTitle.is_initialized())
+			program.SetArticleTitle(articleTitle.get());
 
-			m_programs.push_back(program);
-		}
-		catch (...)
-		{
-		}
+		m_programs.push_back(program);
 	}
 }
 

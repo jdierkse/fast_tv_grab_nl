@@ -62,75 +62,82 @@ std::string GetXML(Configuration configuration, int days, bool fast, bool quiet,
 
 int main(int argc, char** argv)
 {
-	boost::program_options::options_description description("Options");
-
-	description.add_options()
-		("days,d", boost::program_options::value<int>(), "Number of days to grab")
-		("fast,f", "Don't grab detailed information")
-		("nocache,n", "Don't use caching")
-		("quiet,q", "Supress progress output")
-		("clearcache", "Clear the cache file")
-		("createconfig", "Create the configuration file")
-		("help,h", "Print this help information");
-
-	boost::program_options::variables_map vm;
-	boost::program_options::store(boost::program_options::parse_command_line(argc, argv, description), vm);
-
-	// TODO: Multithreading
-
-	int days = 4;
-	bool fast = false;
-	bool quiet = false;
-	bool cache = true;
-
-	if (vm.count("days"))
+	try
 	{
-		days = vm["days"].as<int>();
-	}
+		boost::program_options::options_description description("Options");
 
-	if (vm.count("fast"))
+		description.add_options()
+			("days,d", boost::program_options::value<int>(), "Number of days to grab")
+			("fast,f", "Don't grab detailed information")
+			("nocache,n", "Don't use caching")
+			("quiet,q", "Supress progress output")
+			("clearcache", "Clear the cache file")
+			("createconfig", "Create the configuration file")
+			("help,h", "Print this help information");
+
+		boost::program_options::variables_map vm;
+		boost::program_options::store(boost::program_options::parse_command_line(argc, argv, description), vm);
+
+		// TODO: Multithreading
+
+		int days = 4;
+		bool fast = false;
+		bool quiet = false;
+		bool cache = true;
+
+		if (vm.count("days"))
+		{
+			days = vm["days"].as<int>();
+		}
+
+		if (vm.count("fast"))
+		{
+			fast = true;
+		}
+
+		if (vm.count("nocache"))
+		{
+			cache = false;
+		}
+
+		if (vm.count("quiet"))
+		{
+			quiet = true;
+		}
+
+		if (vm.count("clearcache"))
+		{
+			ClearCache();
+			return 0;
+		}
+
+		if (vm.count("createconfig"))
+		{
+			CreateConfig();
+			return 0;
+		}
+
+		if (vm.count("help"))
+		{
+			PrintHelp();
+			return 0;
+		}
+
+		ConfigurationFile configFile(configFilename);
+		Configuration configuration = configFile.Read();
+		if (!configuration.GetValid())
+		{
+			std::cout << "No config file present." << std::endl;
+			std::cout << "Run fast_tv_grab_nl --createconfig to create a default config file." << std::endl;
+			return -1;
+		}
+
+		std::cout << GetXML(configuration, days, fast, quiet, cache, cacheFilename);
+	}
+	catch (const std::exception& e)
 	{
-		fast = true;
+		std::cerr << "Exception caught: " << e.what() << std::endl;
 	}
-
-	if (vm.count("nocache"))
-	{
-		cache = false;
-	}
-
-	if (vm.count("quiet"))
-	{
-		quiet = true;
-	}
-
-	if (vm.count("clearcache"))
-	{
-		ClearCache();
-		return 0;
-	}
-
-	if (vm.count("createconfig"))
-	{
-		CreateConfig();
-		return 0;
-	}
-
-	if (vm.count("help"))
-	{
-		PrintHelp();
-		return 0;
-	}
-
-	ConfigurationFile configFile(configFilename);
-	Configuration configuration = configFile.Read();
-	if (!configuration.GetValid())
-	{
-		std::cout << "No config file present." << std::endl;
-		std::cout << "Run fast_tv_grab_nl --createconfig to create a default config file." << std::endl;
-		return -1;
-	}
-
-	std::cout << GetXML(configuration, days, fast, quiet, cache, cacheFilename);
 
 	return 0;
 }

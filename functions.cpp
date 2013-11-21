@@ -179,6 +179,7 @@ std::vector<std::string> SplitString(std::string string, std::string delimiter)
 	boost::algorithm::split_regex(strings, string, boost::regex(delimiter));
 	return strings;
 }
+
 std::string FixHTMLAndSpecialCharacters(std::string string)
 {
 	string = boost::regex_replace(string, boost::regex("<[a-zA-Z1-9\\/ ]*>"), "");
