@@ -258,9 +258,10 @@ std::string Program::ConvertGenre(std::string genre)
 {
 	if (genre == "Nieuws/actualiteiten" || genre == "Actualiteit")
 		return "News / Current affairs";
-	if (genre == "Amusement" || genre == "Comedy")
+	if (genre == "Amusement" || genre == "Animatie" ||
+	    genre == "Comedy")
 		return "Show / Game show";
-	if (genre == "Animatie" || genre == "Jeugd")
+	if (genre == "Jeugd")
 		return "Children's / Youth programmes";
 	if (genre == "Serie/soap" || genre == "Film" ||
 	    genre == "Komedie" || genre == "Actiefilm" ||
