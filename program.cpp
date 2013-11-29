@@ -1,7 +1,4 @@
 #include <vector>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
 #include <boost/regex.hpp>
 #include "functions.h"
 #include "program.h"
@@ -26,36 +23,6 @@ bool Program::operator==(const int& value) const
 bool Program::operator<(const Program& other) const
 {
 	return (m_id < other.GetId());
-}
-
-void Program::LoadDetailsFromJSON(std::string json)
-{
-	std::stringstream jsonStream;
-	jsonStream << "{ \"root\": [" << json << "] }";
-
-	boost::property_tree::ptree pt;
-	boost::property_tree::json_parser::read_json(jsonStream, pt);
-
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child("root"))
-	{
-		boost::optional<std::string> synopsis = val.second.get_optional<std::string>("synop");
-		if (synopsis.is_initialized())
-			SetSynopsis(synopsis.get());
-
-		boost::optional<std::string> hosts = val.second.get_optional<std::string>("presentatie");
-		if (hosts.is_initialized())
-			SetHosts(hosts.get());
-
-		boost::optional<std::string> actors = val.second.get_optional<std::string>("acteursnamen_rolverdeling");
-		if (actors.is_initialized())
-			SetActors(actors.get());
-
-		boost::optional<std::string> director = val.second.get_optional<std::string>("regisseur");
-		if (director.is_initialized())
-			SetDirector(director.get());
-	}
-
-	m_detailsLoaded = true;
 }
 
 std::string Program::GetXML() const
@@ -117,11 +84,6 @@ std::string Program::GetXML() const
 Channel Program::GetChannel() const
 {
 	return m_channel;
-}
-
-bool Program::GetDetailsLoaded() const
-{
-	return m_detailsLoaded;
 }
 
 void Program::SetId(int id)
@@ -295,5 +257,15 @@ std::string Program::ConvertDate(std::string date)
 	ss << boost::regex_replace(date, boost::regex("[-: ]"), "") << " +0100";
 
 	return ss.str();
+}
+
+void Program::SetDetailsLoaded(bool detailsLoaded)
+{
+	m_detailsLoaded = detailsLoaded;
+}
+
+bool Program::GetDetailsLoaded() const
+{
+	return m_detailsLoaded;
 }
 

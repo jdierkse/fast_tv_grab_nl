@@ -1,28 +1,6 @@
 #include <sstream>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
 #include "channels.h"
 
-
-void Channels::LoadFromJSON(std::string json)
-{
-	std::stringstream jsonStream;
-	jsonStream << "{ \"root\": " << json << " }";
-
-	boost::property_tree::ptree pt;
-	boost::property_tree::json_parser::read_json(jsonStream, pt);
-
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child("root"))
-	{
-		Channel channel;
-		channel.SetId(val.second.get<int>("id"));
-		channel.SetName(val.second.get<std::string>("name"));
-		channel.SetNameShort(val.second.get<std::string>("name_short"));
-
-		m_channels.push_back(channel);
-	}
-}
 
 std::string Channels::GetXML() const
 {
@@ -82,10 +60,4 @@ void Channels::push_back(Channel channel)
 {
 	m_channels.push_back(channel);
 }
-
-void Channels::clear()
-{
-	m_channels.clear();
-}
-
 

@@ -11,7 +11,6 @@
 class Programs
 {
 public:
-	void LoadFromJSON(Channel channel, std::string json);
 	std::string GetXML() const;
 	bool Remove(Program program);
 
@@ -29,6 +28,8 @@ public:
 	reverse_iterator rend();
 	const_reverse_iterator rend() const;
 	size_t size() const;
+
+	void push_back(Program program);
 
 private:
         friend class boost::serialization::access;

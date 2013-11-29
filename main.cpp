@@ -10,6 +10,7 @@
 #include "channels.h"
 #include "config.h"
 #include "programs.h"
+#include "tvgids_nl.h"
 #include "functions.h"
 
 
@@ -35,15 +36,15 @@ void ClearCache()
 	std::ofstream cacheOutFile(cacheFilename.c_str());
 }
 
-void CreateConfig()
+void CreateConfig(const Provider& provider)
 {
-	Channels channels = GetChannels();
+	Channels channels = provider.GetChannels();
 	ConfigurationFile configFile(configFilename);
 	configFile.SetChannels(channels);
 	configFile.Write();
 }
 
-std::string GetXML(Configuration configuration, int days, bool fast, bool quiet, bool cache, std::string cacheFilename)
+std::string GetXML(Configuration configuration, const Provider& provider, const ScanConfig& scanConfig)
 {
 	std::stringstream ss;
 
@@ -53,7 +54,7 @@ std::string GetXML(Configuration configuration, int days, bool fast, bool quiet,
 
 	Channels channels = configuration.GetChannels();
 	ss << channels.GetXML();
-	ss << GetPrograms(channels, days, fast, quiet, cache, cacheFilename).GetXML();
+	ss << provider.GetPrograms(channels, scanConfig).GetXML();
 
 	ss << "</tv>" << std::endl;
 
@@ -73,7 +74,8 @@ int main(int argc, char** argv)
 			("quiet,q", "Supress progress output")
 			("clearcache", "Clear the cache file")
 			("createconfig", "Create the configuration file")
-			("help,h", "Print this help information");
+			("help,h", "Print this help information")
+			("test,t", "Test functionality");
 
 		boost::program_options::variables_map vm;
 		boost::program_options::store(boost::program_options::parse_command_line(argc, argv, description), vm);
@@ -84,6 +86,8 @@ int main(int argc, char** argv)
 		bool fast = false;
 		bool quiet = false;
 		bool cache = true;
+
+		TvGidsNL provider;
 
 		if (vm.count("days"))
 		{
@@ -113,7 +117,7 @@ int main(int argc, char** argv)
 
 		if (vm.count("createconfig"))
 		{
-			CreateConfig();
+			CreateConfig(provider);
 			return 0;
 		}
 
@@ -123,8 +127,13 @@ int main(int argc, char** argv)
 			return 0;
 		}
 
+		if (vm.count("test"))
+		{
+			return 0;
+		}
+
 		ConfigurationFile configFile(configFilename);
-		Configuration configuration = configFile.Read();
+		Configuration configuration = configFile.Read(provider);
 		if (!configuration.GetValid())
 		{
 			std::cout << "No config file present." << std::endl;
@@ -132,7 +141,7 @@ int main(int argc, char** argv)
 			return -1;
 		}
 
-		std::cout << GetXML(configuration, days, fast, quiet, cache, cacheFilename);
+		std::cout << GetXML(configuration, provider, ScanConfig(days, fast, quiet, cache, cacheFilename));
 	}
 	catch (const std::exception& e)
 	{

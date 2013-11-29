@@ -3,6 +3,7 @@
 
 #include <string>
 #include "channels.h"
+#include "provider.h"
 
 
 class Configuration
@@ -31,7 +32,7 @@ public:
 public:
 	void SetChannels(Channels channels);
 
-	Configuration Read();
+	Configuration Read(const Provider& provider);
 	void Write();
 
 private:

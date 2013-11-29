@@ -1,47 +1,5 @@
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
 #include "programs.h"
 
-
-void Programs::LoadFromJSON(Channel channel, std::string json)
-{
-	std::stringstream jsonStream;
-	jsonStream << json;
-
-	std::stringstream channelIdStream;
-	channelIdStream << channel.GetId();
-
-	boost::property_tree::ptree pt;
-	boost::property_tree::json_parser::read_json(jsonStream, pt);
-
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child(channelIdStream.str().c_str()))
-	{
-		Program program(channel);
-
-		program.SetId(val.second.get<int>("db_id"));
-
-		if (std::find(m_programs.begin(), m_programs.end(), program.GetId()) != m_programs.end())
-			continue;
-
-		program.SetTitle(val.second.get<std::string>("titel"));
-		program.SetType(val.second.get<std::string>("soort"));
-		program.SetGenre(val.second.get<std::string>("genre"));
-		program.SetRating(val.second.get<std::string>("kijkwijzer"));
-		program.SetDateStart(val.second.get<std::string>("datum_start"));
-		program.SetDateEnd(val.second.get<std::string>("datum_end"));
-
-		boost::optional<int> articleId = val.second.get_optional<int>("artikel_id");
-		if (articleId.is_initialized())
-			program.SetArticleId(articleId.get());
-			
-		boost::optional<std::string> articleTitle = val.second.get_optional<std::string>("artikel_titel");
-		if (articleTitle.is_initialized())
-			program.SetArticleTitle(articleTitle.get());
-
-		m_programs.push_back(program);
-	}
-}
 
 std::string Programs::GetXML() const
 {
@@ -108,3 +66,7 @@ size_t Programs::size() const
 	return m_programs.size();
 }
 
+void Programs::push_back(Program program)
+{
+	m_programs.push_back(program);
+}

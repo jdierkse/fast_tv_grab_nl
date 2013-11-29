@@ -15,11 +15,9 @@ public:
 	bool operator==(const int& value) const;
 	bool operator<(const Program& other) const;
 
-	void LoadDetailsFromJSON(std::string json);
 	std::string GetXML() const;
 
 	Channel GetChannel() const;
-	bool GetDetailsLoaded() const;
 
 	void SetId(int id);
 	int GetId() const;
@@ -50,6 +48,9 @@ public:
 	std::string GetActors() const;
 	void SetDirector(std::string director);
 	std::string GetDirector() const;
+
+	void SetDetailsLoaded(bool detailsLoaded);
+	bool GetDetailsLoaded() const;
 
 private:
 	Program();

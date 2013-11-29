@@ -4,14 +4,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "httpdata.h"
-#include "channels.h"
-#include "programs.h"
 
 
-Channels GetChannels();
 int OutputProgress(int currentItem, int totalItems, int previousPercentage);
-Programs GetPrograms(Channels channels, int days, bool fast, bool quiet, bool cache, std::string cacheFilename);
 std::vector<std::string> SplitString(std::string string, std::string delimiter);
 std::string FixHTMLAndSpecialCharacters(std::string string);
 

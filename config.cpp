@@ -49,7 +49,7 @@ void ConfigurationFile::SetChannels(Channels channels)
 	m_configuration.SetChannels(channels);
 }
 
-Configuration ConfigurationFile::Read()
+Configuration ConfigurationFile::Read(const Provider& provider)
 {
 	std::ifstream file(m_filename.c_str());
 	if (!file.good())
@@ -68,7 +68,7 @@ Configuration ConfigurationFile::Read()
 	}
 
 	Channels channels;
-	Channels allChannels = GetChannels();
+	Channels allChannels = provider.GetChannels();
 	
 	for (Channels::iterator it = allChannels.begin(); it != allChannels.end(); ++it)
 	{

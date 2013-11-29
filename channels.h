@@ -9,7 +9,6 @@
 class Channels
 {
 public:
-	void LoadFromJSON(std::string json);
 	std::string GetXML() const;
 
 	typedef std::vector<Channel>::iterator iterator;
@@ -28,7 +27,6 @@ public:
 	size_t size() const;
 
 	void push_back(Channel channel);
-	void clear();
 
 private:
 	std::vector<Channel> m_channels;
