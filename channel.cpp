@@ -2,6 +2,11 @@
 #include "functions.h"
 #include "channel.h"
 
+Channel::Channel() :
+	m_id(0)
+{
+}
+
 bool Channel::operator==(int value) const
 {
 	return m_id == value;
@@ -31,6 +36,16 @@ void Channel::SetId(int id)
 int Channel::GetId() const
 {
 	return m_id;
+}
+
+void Channel::SetInternalId(std::string internalId)
+{
+	m_internalId = internalId;
+}
+
+std::string Channel::GetInternalId() const
+{
+	return m_internalId;
 }
 
 void Channel::SetName(std::string name)

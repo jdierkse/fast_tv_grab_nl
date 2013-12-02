@@ -6,11 +6,14 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <boost/program_options.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include "httpdata.h"
 #include "channels.h"
 #include "config.h"
 #include "programs.h"
 #include "tvgids_nl.h"
+#include "upc_nl.h"
 #include "functions.h"
 
 
@@ -22,13 +25,14 @@ void PrintHelp()
 {
 	std::cout << "Usage: fast_tv_grab_nl [options]" << std::endl;
 	std::cout << "Options:" << std::endl;
-	std::cout << "  --days N -d N   Number of days to grab (default: 4)" << std::endl;
-	std::cout << "  --fast -f       Don't grab detailed information" << std::endl;
-	std::cout << "  --nocache -n    Don't use caching" << std::endl;
-	std::cout << "  --quiet -q      Supress progress output" << std::endl;
-	std::cout << "  --clearcache    Clear the cache file" << std::endl;
-	std::cout << "  --createconfig  Create the configuration file" << std::endl;
-	std::cout << "  --help -h       Print this help information" << std::endl;
+	std::cout << "  --provider [upc,tvgids] -p [upc,tvgids] Provider to use" << std::endl;
+	std::cout << "  --days N -d N                           Number of days to grab (default: 4)" << std::endl;
+	std::cout << "  --fast -f                               Don't grab detailed information" << std::endl;
+	std::cout << "  --nocache -n                            Don't use caching" << std::endl;
+	std::cout << "  --quiet -q                              Supress progress output" << std::endl;
+	std::cout << "  --clearcache                            Clear the cache file" << std::endl;
+	std::cout << "  --createconfig                          Create the configuration file" << std::endl;
+	std::cout << "  --help -h                               Print this help information" << std::endl;
 }
 
 void ClearCache()
@@ -61,6 +65,10 @@ std::string GetXML(Configuration configuration, const Provider& provider, const 
 	return ss.str();
 }
 
+void Test()
+{
+}
+
 int main(int argc, char** argv)
 {
 	try
@@ -68,6 +76,7 @@ int main(int argc, char** argv)
 		boost::program_options::options_description description("Options");
 
 		description.add_options()
+			("provider,p", boost::program_options::value<std::string>(), "Provider use")
 			("days,d", boost::program_options::value<int>(), "Number of days to grab")
 			("fast,f", "Don't grab detailed information")
 			("nocache,n", "Don't use caching")
@@ -82,12 +91,11 @@ int main(int argc, char** argv)
 
 		// TODO: Multithreading
 
+		boost::shared_ptr<Provider> pProvider;
 		int days = 4;
 		bool fast = false;
 		bool quiet = false;
 		bool cache = true;
-
-		TvGidsNL provider;
 
 		if (vm.count("days"))
 		{
@@ -115,12 +123,6 @@ int main(int argc, char** argv)
 			return 0;
 		}
 
-		if (vm.count("createconfig"))
-		{
-			CreateConfig(provider);
-			return 0;
-		}
-
 		if (vm.count("help"))
 		{
 			PrintHelp();
@@ -129,11 +131,42 @@ int main(int argc, char** argv)
 
 		if (vm.count("test"))
 		{
+			Test();
+			return 0;
+		}
+
+		if (vm.count("provider"))
+		{
+			std::string provider = vm["provider"].as<std::string>();
+			if (provider == "upc")
+			{
+				pProvider = boost::make_shared<UPCNL>(UPCNL());
+			}
+			else if(provider != "tvgids")
+			{
+				pProvider = boost::make_shared<TvGidsNL>(TvGidsNL());
+			}
+			else
+			{
+				std::cout << "Unknown provider \"" << provider << "\"" << std::endl;
+				return -1;
+			}
+		}
+		else
+		{
+			std::cout << "No provider selected." << std::endl;
+			return -1;
+		}
+
+		if (vm.count("createconfig"))
+		{
+			CreateConfig(*pProvider.get());
 			return 0;
 		}
 
 		ConfigurationFile configFile(configFilename);
-		Configuration configuration = configFile.Read(provider);
+		Configuration configuration = configFile.Read(*pProvider.get());
+
 		if (!configuration.GetValid())
 		{
 			std::cout << "No config file present." << std::endl;
@@ -141,7 +174,7 @@ int main(int argc, char** argv)
 			return -1;
 		}
 
-		std::cout << GetXML(configuration, provider, ScanConfig(days, fast, quiet, cache, cacheFilename));
+		std::cout << GetXML(configuration, *pProvider.get(), ScanConfig(days, fast, quiet, cache, cacheFilename));
 	}
 	catch (const std::exception& e)
 	{

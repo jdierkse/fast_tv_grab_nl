@@ -73,7 +73,10 @@ Configuration ConfigurationFile::Read(const Provider& provider)
 	for (Channels::iterator it = allChannels.begin(); it != allChannels.end(); ++it)
 	{
 		if (channelMap.find(it->GetId()) != channelMap.end())
+		{
+			it->SetName(channelMap[it->GetId()]);
 			channels.push_back(*it);
+		}
 	}
 
 	m_configuration.SetChannels(channels);

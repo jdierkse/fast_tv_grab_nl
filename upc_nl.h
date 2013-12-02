@@ -1,9 +1,9 @@
-#ifndef TVGIDS_NL_H
-#define TVGIDS_NL_H
+#ifndef UPC_NL_H
+#define UPC_NL_H
 
 #include "provider.h"
 
-class TvGidsNL : public Provider
+class UPCNL : public Provider
 {
 public:
 	virtual Channels GetChannels() const;
@@ -12,10 +12,9 @@ public:
 private:
 	Channels LoadFromJSON(std::string json) const;
 	void LoadFromJSON(Programs& programs, Channel channel, std::string json) const;
-	void LoadDetailsFromJSON(Program& program, std::string json) const;
 	std::string ConvertGenre(std::string genre) const;
-	std::string ConvertDate(std::string date) const;
+	std::string ConvertDate(int date) const;
 };
 
-#endif // TVGIDS_NL_H
+#endif // UPC_NL_H
 

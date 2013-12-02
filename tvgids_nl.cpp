@@ -5,6 +5,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
+#include <boost/regex.hpp>
 #include "functions.h"
 #include "httpdata.h"
 #include "tvgids_nl.h"
@@ -193,10 +194,10 @@ void TvGidsNL::LoadFromJSON(Programs& programs, Channel channel, std::string jso
 
 		program.SetTitle(val.second.get<std::string>("titel"));
 		program.SetType(val.second.get<std::string>("soort"));
-		program.SetGenre(val.second.get<std::string>("genre"));
+		program.SetGenre(ConvertGenre(val.second.get<std::string>("genre")));
 		program.SetRating(val.second.get<std::string>("kijkwijzer"));
-		program.SetDateStart(val.second.get<std::string>("datum_start"));
-		program.SetDateEnd(val.second.get<std::string>("datum_end"));
+		program.SetDateStart(ConvertDate(val.second.get<std::string>("datum_start")));
+		program.SetDateEnd(ConvertDate(val.second.get<std::string>("datum_end")));
 
 		boost::optional<int> articleId = val.second.get_optional<int>("artikel_id");
 		if (articleId.is_initialized())
@@ -239,4 +240,49 @@ void TvGidsNL::LoadDetailsFromJSON(Program& program, std::string json) const
 
 	program.SetDetailsLoaded(true);
 }
+
+std::string TvGidsNL::ConvertGenre(std::string genre) const
+{
+	if (genre == "Nieuws/actualiteiten" || genre == "Actualiteit")
+		return "News / Current affairs";
+	if (genre == "Amusement" || genre == "Animatie" ||
+	    genre == "Comedy")
+		return "Show / Game show";
+	if (genre == "Jeugd")
+		return "Children's / Youth programmes";
+	if (genre == "Serie/soap" || genre == "Film" ||
+	    genre == "Komedie" || genre == "Actiefilm" ||
+	    genre == "Tekenfilm" || genre == "Animatiekomedie" ||
+	    genre == "Thriller" || genre == "Familiekomedie" ||
+	    genre == "Romantische Komedie" || genre == "Serie" ||
+	    genre == "Misdaad")
+		return "Movie / Drama";
+	if (genre == "Info" || genre == "Informatief" ||
+	    genre == "Documentaire" || genre == "Wetenschap" ||
+	    genre == "Natuur" || genre == "Educatief")
+		return "Education / Science / Factual topics";
+	if (genre == "Sport")
+		return "Sports";
+	if (genre == "Erotiek")
+		return "Leisure hobbies";
+	if (genre == "Muziek")
+		return "Music / Ballet / Dance";
+	if (genre == "Religieus")
+		return "Social / Political issues / Economics";
+	if (genre == "Kunst/Cultuur" || genre == "Kunst/cultuur" || genre == "Cultuur")
+		return "Arts / Culture (without music)";
+	if (genre == "Overig" || genre == "Overige")
+		return "Other";
+
+	return genre;
+}
+
+std::string TvGidsNL::ConvertDate(std::string date) const
+{
+	std::stringstream ss;
+	ss << boost::regex_replace(date, boost::regex("[-: ]"), "") << " +0100";
+
+	return ss.str();
+}
+
 

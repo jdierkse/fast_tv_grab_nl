@@ -1,23 +1,31 @@
 #include <vector>
-#include <boost/regex.hpp>
 #include "functions.h"
 #include "program.h"
 
 
 Program::Program() :
-	m_detailsLoaded(false)
+	m_detailsLoaded(false),
+	m_id(0),
+	m_articleId(0)
 {
 }
 
 Program::Program(Channel channel) :
 	m_channel(channel),
-	m_detailsLoaded(false)
+	m_detailsLoaded(false),
+	m_id(0),
+	m_articleId(0)
 {
 }
 
 bool Program::operator==(const int& value) const
 {
 	return m_id == value;
+}
+
+bool Program::operator==(const std::string& value) const
+{
+	return m_internalId == value;
 }
 
 bool Program::operator<(const Program& other) const
@@ -30,25 +38,37 @@ std::string Program::GetXML() const
 	std::stringstream ss;
 	ss << "  <programme start=\"" << m_dateStart << "\" stop=\"" << m_dateEnd << "\" channel=\"" << m_channel.GetId() << "\">" << std::endl;
 
-	bool subTitle = false;
-	std::vector<std::string> titles = SplitString(m_title, ": ");
-	for (std::vector<std::string>::iterator it = titles.begin(); it != titles.end(); ++it)
+	if (m_subTitle.empty())
 	{
-		if (!subTitle)
+		bool subTitle = false;
+		std::vector<std::string> titles = SplitString(m_title, ": ");
+		for (std::vector<std::string>::iterator it = titles.begin(); it != titles.end(); ++it)
 		{
-			ss << "    <title lang=\"nl\">" << *it << "</title>" << std::endl;
-			subTitle = true;
-		}
-		else
-		{
-			ss << "    <sub-title lang=\"nl\">" << *it << "</sub-title>" << std::endl;
+			if (!subTitle)
+			{
+				ss << "    <title lang=\"nl\">" << *it << "</title>" << std::endl;
+				subTitle = true;
+			}
+			else
+			{
+				ss << "    <sub-title lang=\"nl\">" << *it << "</sub-title>" << std::endl;
+			}
 		}
 	}
+	else
+	{
+		ss << "    <title lang=\"nl\">" << m_title << "</title>" << std::endl;
+		ss << "    <sub-title lang=\"nl\">" << m_subTitle << "</sub-title>" << std::endl;
+	}
+
+	if (!m_country.empty())
+		ss << "    <country>" << m_country << "</country>" << std::endl;
 
 	if (!m_synopsis.empty())
 		ss << "    <desc lang=\"nl\">" << m_synopsis << "</desc>" << std::endl;
 
-	ss << "    <category lang=\"en\">" << m_genre << "</category>" << std::endl;
+	if (!m_genre.empty())
+		ss << "    <category lang=\"en\">" << m_genre << "</category>" << std::endl;
 
 	if (!m_director.empty() || !m_actors.empty() || !m_hosts.empty())
 	{
@@ -96,6 +116,16 @@ int Program::GetId() const
 	return m_id;
 }
 
+void Program::SetInternalId(std::string internalId)
+{
+	m_internalId = internalId;
+}
+
+std::string Program::GetInternalId() const
+{
+	return m_internalId;
+}
+
 void Program::SetTitle(std::string title)
 {
 	m_title = FixHTMLAndSpecialCharacters(title);
@@ -106,9 +136,19 @@ std::string Program::GetTitle() const
 	return m_title;
 }
 
+void Program::SetSubTitle(std::string subTitle)
+{
+	m_subTitle = subTitle;
+}
+
+std::string Program::GetSubTitle() const
+{
+	return m_subTitle;
+}
+
 void Program::SetGenre(std::string genre)
 {
-	m_genre = ConvertGenre(genre);
+	m_genre = genre;
 }
 
 std::string Program::GetGenre() const
@@ -158,7 +198,7 @@ std::string Program::GetArticleTitle() const
 
 void Program::SetDateStart(std::string dateStart)
 {
-	m_dateStart = ConvertDate(dateStart);
+	m_dateStart = dateStart;
 }
 
 std::string Program::GetDateStart() const
@@ -168,12 +208,22 @@ std::string Program::GetDateStart() const
 
 void Program::SetDateEnd(std::string dateEnd)
 {
-	m_dateEnd = ConvertDate(dateEnd);
+	m_dateEnd = dateEnd;
 }
 
 std::string Program::GetDateEnd() const
 {
 	return m_dateEnd;
+}
+
+void Program::SetCountry(std::string country)
+{
+	m_country = country;
+}
+
+std::string Program::GetCountry() const
+{
+	return m_country;
 }
 
 void Program::SetSynopsis(std::string synopsis)
@@ -214,49 +264,6 @@ void Program::SetDirector(std::string director)
 std::string Program::GetDirector() const
 {
 	return m_director;
-}
-
-std::string Program::ConvertGenre(std::string genre)
-{
-	if (genre == "Nieuws/actualiteiten" || genre == "Actualiteit")
-		return "News / Current affairs";
-	if (genre == "Amusement" || genre == "Animatie" ||
-	    genre == "Comedy")
-		return "Show / Game show";
-	if (genre == "Jeugd")
-		return "Children's / Youth programmes";
-	if (genre == "Serie/soap" || genre == "Film" ||
-	    genre == "Komedie" || genre == "Actiefilm" ||
-	    genre == "Tekenfilm" || genre == "Animatiekomedie" ||
-	    genre == "Thriller" || genre == "Familiekomedie" ||
-	    genre == "Romantische Komedie" || genre == "Serie" ||
-	    genre == "Misdaad")
-		return "Movie / Drama";
-	if (genre == "Info" || genre == "Informatief" ||
-	    genre == "Documentaire" || genre == "Wetenschap" ||
-	    genre == "Natuur" || genre == "Educatief")
-		return "Education / Science / Factual topics";
-	if (genre == "Sport")
-		return "Sports";
-	if (genre == "Erotiek")
-		return "Leisure hobbies";
-	if (genre == "Muziek")
-		return "Music / Ballet / Dance";
-	if (genre == "Religieus")
-		return "Social / Political issues / Economics";
-	if (genre == "Kunst/Cultuur" || genre == "Kunst/cultuur" || genre == "Cultuur")
-		return "Arts / Culture (without music)";
-	if (genre == "Overig" || genre == "Overige")
-		return "Other";
-	return genre;
-}
-
-std::string Program::ConvertDate(std::string date)
-{
-	std::stringstream ss;
-	ss << boost::regex_replace(date, boost::regex("[-: ]"), "") << " +0100";
-
-	return ss.str();
 }
 
 void Program::SetDetailsLoaded(bool detailsLoaded)

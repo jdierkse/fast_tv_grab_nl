@@ -13,6 +13,7 @@ public:
 	Program(Channel channel);
 
 	bool operator==(const int& value) const;
+	bool operator==(const std::string& value) const;
 	bool operator<(const Program& other) const;
 
 	std::string GetXML() const;
@@ -21,8 +22,12 @@ public:
 
 	void SetId(int id);
 	int GetId() const;
+	void SetInternalId(std::string internalId);
+	std::string GetInternalId() const;
 	void SetTitle(std::string title);
 	std::string GetTitle() const;
+	void SetSubTitle(std::string subTitle);
+	std::string GetSubTitle() const;
 	void SetGenre(std::string genre);
 	std::string GetGenre() const;
 	void SetType(std::string type);
@@ -40,6 +45,8 @@ public:
 	void SetDateEnd(std::string dateEnd);
 	std::string GetDateEnd() const;
 
+	void SetCountry(std::string country);
+	std::string GetCountry() const;
 	void SetSynopsis(std::string synopsis);
 	std::string GetSynopsis() const;
 	void SetHosts(std::string hosts);
@@ -63,6 +70,7 @@ private:
 		ar & m_channel;
 		ar & m_detailsLoaded;
 		ar & m_id;
+		ar & m_internalId;
 		ar & m_title;
 		ar & m_genre;
 		ar & m_type;
@@ -78,15 +86,13 @@ private:
 	}
 
 private:
-	std::string ConvertGenre(std::string genre);
-	std::string ConvertDate(std::string date);
-
-private:
 	Channel m_channel;
 	bool m_detailsLoaded;
 
 	int m_id;
+	std::string m_internalId;
 	std::string m_title;
+	std::string m_subTitle;
 	std::string m_genre;
 	std::string m_type;
 	std::string m_rating;
@@ -97,6 +103,7 @@ private:
 	std::string m_dateStart;
 	std::string m_dateEnd;
 
+	std::string m_country;
 	std::string m_synopsis;
 	std::string m_hosts;
 	std::string m_actors;
