@@ -23,6 +23,10 @@ std::string Channel::GetXML() const
 
 	ss << "  <channel id=\"" << m_id << "\">" << std::endl;
 	ss << "    <display-name lang=\"nl\">" << m_name << "</display-name>" << std::endl;
+
+	if (!m_iconUrl.empty())
+		ss << "    <icon src=\"" << m_iconUrl << "\" />" << std::endl;
+
 	ss << "  </channel>" << std::endl;
 
 	return ss.str();
@@ -66,5 +70,15 @@ void Channel::SetNameShort(std::string nameShort)
 std::string Channel::GetNameShort() const
 {
 	return m_nameShort;
+}
+
+void Channel::SetIconUrl(std::string iconUrl)
+{
+	m_iconUrl = iconUrl;
+}
+
+std::string Channel::GetIconUrl() const
+{
+	return m_iconUrl;
 }
 

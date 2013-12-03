@@ -23,6 +23,8 @@ public:
 	std::string GetName() const;
 	void SetNameShort(std::string nameShort);
 	std::string GetNameShort() const;
+	void SetIconUrl(std::string iconUrl);
+	std::string GetIconUrl() const;
 
 private:
 	friend class boost::serialization::access;
@@ -33,6 +35,7 @@ private:
 		ar & m_internalId;
 		ar & m_name;
 		ar & m_nameShort;
+		ar & m_iconUrl;
 	}
 
 private:
@@ -40,6 +43,7 @@ private:
 	std::string m_internalId;
 	std::string m_name;
 	std::string m_nameShort;
+	std::string m_iconUrl;
 };
 
 #endif // CHANNEL_H

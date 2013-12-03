@@ -84,6 +84,13 @@ Channels UPCNL::LoadFromJSON(std::string json) const
 			boost::property_tree::ptree c = v.second.get_child("station");
 			channel.SetInternalId(c.get<std::string>("id"));
 			channel.SetName(c.get<std::string>("title"));
+
+			BOOST_FOREACH(boost::property_tree::ptree::value_type &i, c.get_child("images"))
+			{
+				std::string assetType = i.second.get<std::string>("assetType");
+				if (assetType == "station-logo-large")
+					channel.SetIconUrl(i.second.get<std::string>("url"));
+			}
 		}
 
 		channels.push_back(channel);
