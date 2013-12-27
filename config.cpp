@@ -19,34 +19,34 @@ Configuration::Configuration() :
 {
 }
 
-bool Configuration::GetValid() const
+bool Configuration::Valid() const
 {
 	return m_valid;
 }
 
-Channels Configuration::GetChannels() const
+::Channels Configuration::Channels() const
 {
 	return m_channels;
 }
 
-void Configuration::SetValid(bool valid)
+void Configuration::Valid(bool valid)
 {
 	m_valid = valid;
 }
 
-void Configuration::SetChannels(Channels channels)
+void Configuration::Channels(const ::Channels& channels)
 {
 	m_channels = channels;
 }
 
-ConfigurationFile::ConfigurationFile(std::string filename) :
+ConfigurationFile::ConfigurationFile(const std::string& filename) :
 	m_filename(filename)
 {
 }
 
-void ConfigurationFile::SetChannels(Channels channels)
+void ConfigurationFile::Channels(const ::Channels& channels)
 {
-	m_configuration.SetChannels(channels);
+	m_configuration.Channels(channels);
 }
 
 Configuration ConfigurationFile::Read(const Provider& provider)
@@ -67,20 +67,20 @@ Configuration ConfigurationFile::Read(const Provider& provider)
 			channelMap[boost::lexical_cast<int>(split[0])] = split[1];
 	}
 
-	Channels channels;
-	Channels allChannels = provider.GetChannels();
+	::Channels channels;
+	::Channels allChannels = provider.GetChannels();
 	
-	for (Channels::iterator it = allChannels.begin(); it != allChannels.end(); ++it)
+	for (::Channels::iterator it = allChannels.begin(); it != allChannels.end(); ++it)
 	{
-		if (channelMap.find(it->GetId()) != channelMap.end())
+		if (channelMap.find(it->Id()) != channelMap.end())
 		{
-			it->SetName(channelMap[it->GetId()]);
+			it->Name(channelMap[it->Id()]);
 			channels.push_back(*it);
 		}
 	}
 
-	m_configuration.SetChannels(channels);
-	m_configuration.SetValid(true);
+	m_configuration.Channels(channels);
+	m_configuration.Valid(true);
 
 	return m_configuration;
 }
@@ -92,8 +92,8 @@ void ConfigurationFile::Write()
 	boost::filesystem::create_directories(directory);
 
 	std::ofstream file(m_filename.c_str());
-	Channels channels = m_configuration.GetChannels();
-	for (Channels::iterator it = channels.begin(); it != channels.end(); ++it)
-		file << it->GetId() << "=" << it->GetName() << std::endl;
+	::Channels channels = m_configuration.Channels();
+	for (::Channels::iterator it = channels.begin(); it != channels.end(); ++it)
+		file << it->Id() << "=" << it->Name() << std::endl;
 }
 

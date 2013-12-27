@@ -8,7 +8,7 @@
 #include <boost/program_options.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include "httpdata.h"
+#include <curl/curl.h>
 #include "channels.h"
 #include "config.h"
 #include "programs.h"
@@ -27,8 +27,6 @@ void PrintHelp()
 	std::cout << "Options:" << std::endl;
 	std::cout << "  --provider [upc,tvgids] -p [upc,tvgids] Provider to use" << std::endl;
 	std::cout << "  --days N -d N                           Number of days to grab (default: 4)" << std::endl;
-	std::cout << "  --fast -f                               Don't grab detailed information" << std::endl;
-	std::cout << "  --nocache -n                            Don't use caching" << std::endl;
 	std::cout << "  --quiet -q                              Supress progress output" << std::endl;
 	std::cout << "  --clearcache                            Clear the cache file" << std::endl;
 	std::cout << "  --createconfig                          Create the configuration file" << std::endl;
@@ -44,11 +42,11 @@ void CreateConfig(const Provider& provider)
 {
 	Channels channels = provider.GetChannels();
 	ConfigurationFile configFile(configFilename);
-	configFile.SetChannels(channels);
+	configFile.Channels(channels);
 	configFile.Write();
 }
 
-std::string GetXML(Configuration configuration, const Provider& provider, const ScanConfig& scanConfig)
+std::string GetXML(Configuration configuration, Provider& provider, const ScanConfig& scanConfig)
 {
 	std::stringstream ss;
 
@@ -56,13 +54,22 @@ std::string GetXML(Configuration configuration, const Provider& provider, const 
 	ss << "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">" << std::endl;
 	ss << "<tv generator-info-name=\"fast_tv_grab_nl\">" << std::endl;
 
-	Channels channels = configuration.GetChannels();
+	Channels channels = configuration.Channels();
 	ss << channels.GetXML();
 	ss << provider.GetPrograms(channels, scanConfig).GetXML();
 
 	ss << "</tv>" << std::endl;
 
 	return ss.str();
+}
+
+size_t write_to_buffer(char* data, size_t size, size_t nmemb, std::string* writerData)
+{
+	if (writerData == NULL)
+		return 0;
+
+	writerData->append(data, size * nmemb);
+	return size * nmemb;
 }
 
 void Test()
@@ -78,8 +85,6 @@ int main(int argc, char** argv)
 		description.add_options()
 			("provider,p", boost::program_options::value<std::string>(), "Provider use")
 			("days,d", boost::program_options::value<int>(), "Number of days to grab")
-			("fast,f", "Don't grab detailed information")
-			("nocache,n", "Don't use caching")
 			("quiet,q", "Supress progress output")
 			("clearcache", "Clear the cache file")
 			("createconfig", "Create the configuration file")
@@ -89,27 +94,13 @@ int main(int argc, char** argv)
 		boost::program_options::variables_map vm;
 		boost::program_options::store(boost::program_options::parse_command_line(argc, argv, description), vm);
 
-		// TODO: Multithreading
-
 		boost::shared_ptr<Provider> pProvider;
 		int days = 4;
-		bool fast = false;
-		bool quiet = false;
 		bool cache = true;
 
 		if (vm.count("days"))
 		{
 			days = vm["days"].as<int>();
-		}
-
-		if (vm.count("fast"))
-		{
-			fast = true;
-		}
-
-		if (vm.count("nocache"))
-		{
-			cache = false;
 		}
 
 		if (vm.count("quiet"))
@@ -140,11 +131,11 @@ int main(int argc, char** argv)
 			std::string provider = vm["provider"].as<std::string>();
 			if (provider == "upc")
 			{
-				pProvider = boost::make_shared<UPCNL>(UPCNL());
+				pProvider = boost::make_shared<UPCNL>();
 			}
 			else if(provider != "tvgids")
 			{
-				pProvider = boost::make_shared<TvGidsNL>(TvGidsNL());
+				pProvider = boost::make_shared<TvGidsNL>();
 			}
 			else
 			{
@@ -158,6 +149,8 @@ int main(int argc, char** argv)
 			return -1;
 		}
 
+		curl_global_init(CURL_GLOBAL_ALL);
+
 		if (vm.count("createconfig"))
 		{
 			CreateConfig(*pProvider.get());
@@ -167,14 +160,16 @@ int main(int argc, char** argv)
 		ConfigurationFile configFile(configFilename);
 		Configuration configuration = configFile.Read(*pProvider.get());
 
-		if (!configuration.GetValid())
+		if (!configuration.Valid())
 		{
 			std::cout << "No config file present." << std::endl;
 			std::cout << "Run fast_tv_grab_nl --createconfig to create a default config file." << std::endl;
 			return -1;
 		}
 
-		std::cout << GetXML(configuration, *pProvider.get(), ScanConfig(days, fast, quiet, cache, cacheFilename));
+		std::cout << GetXML(configuration, *pProvider.get(), ScanConfig(days, quiet, cacheFilename));
+
+		curl_global_cleanup();
 	}
 	catch (const std::exception& e)
 	{

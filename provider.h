@@ -11,7 +11,7 @@ class Provider
 {
 public:
 	virtual Channels GetChannels() const = 0;
-	virtual Programs GetPrograms(Channels channels, const ScanConfig& scanConfig) const = 0;
+	virtual Programs GetPrograms(Channels& channels, const ScanConfig& scanConfig) = 0;
 
 };
 

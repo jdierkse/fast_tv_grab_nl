@@ -1,6 +1,6 @@
 CC := g++
 CFLAGS := 
-LFLAGS := -L/opt/lib -lboost_program_options -lboost_regex -lboost_system -lboost_filesystem -lboost_serialization -lboost_date_time
+LFLAGS := -L/opt/lib -lboost_program_options -lboost_regex -lboost_system -lboost_filesystem -lboost_serialization -lboost_date_time -lboost_thread
 
 ifeq ($(BUILD),debug)
 # Debug flags
@@ -34,7 +34,7 @@ scanconfig.o: scanconfig.cpp scanconfig.h
 
 tvgids_nl.o: tvgids_nl.cpp tvgids_nl.h provider.h scanconfig.h channels.h programs.h
 
-upc_nl.o: upc_nl.cpp upc_nl.h provider.h scanconfig.h
+upc_nl.o: upc_nl.cpp upc_nl.h provider.h scanconfig.h threadpool.h
 
 functions.o: functions.cpp functions.h channels.h programs.h
 

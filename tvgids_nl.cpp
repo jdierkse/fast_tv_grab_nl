@@ -22,25 +22,23 @@ Channels TvGidsNL::GetChannels() const
 	return channels;
 }
 
-Programs TvGidsNL::GetPrograms(Channels channels, const ScanConfig& scanConfig) const
+Programs TvGidsNL::GetPrograms(Channels& channels, const ScanConfig& scanConfig)
 {
 	int days = (scanConfig.days > 4)? 4: scanConfig.days;
 
 	Programs programs;
-	if (scanConfig.cache)
+
+	std::ifstream cacheInFile(scanConfig.cacheFilename.c_str());
+	if (cacheInFile.good())
 	{
-		std::ifstream cacheInFile(scanConfig.cacheFilename.c_str());
-		if (cacheInFile.good())
+		try
 		{
-			try
-			{
-				boost::archive::text_iarchive cacheInArchive(cacheInFile);
-				cacheInArchive >> programs;
-			}
-			catch (const boost::archive::archive_exception&)
-			{
-				programs = Programs();
-			}
+			boost::archive::text_iarchive cacheInArchive(cacheInFile);
+			cacheInArchive >> programs;
+		}
+		catch (const boost::archive::archive_exception&)
+		{
+			programs = Programs();
 		}
 	}
 
@@ -60,7 +58,7 @@ Programs TvGidsNL::GetPrograms(Channels channels, const ScanConfig& scanConfig) 
 		{
 			HttpData httpData;
 			std::stringstream ss;
-			ss << "http://www.tvgids.nl/json/lists/programs.php?channels=" << it->GetId() << "&day=" << day;
+			ss << "http://www.tvgids.nl/json/lists/programs.php?channels=" << it->Id() << "&day=" << day;
 			std::string programsString = httpData.GetUrlContents(ss.str());
 
 			LoadFromJSON(programs, *it, programsString);
@@ -70,65 +68,59 @@ Programs TvGidsNL::GetPrograms(Channels channels, const ScanConfig& scanConfig) 
 	if (!scanConfig.quiet)
 		OutputProgress(item, total, percent);
 
-	if (scanConfig.cache)
+	int today = boost::lexical_cast<int>(boost::gregorian::to_iso_string(boost::gregorian::day_clock::local_day()));
+	std::vector<Program> deleteList;
+
+	for (Programs::iterator it = programs.begin(); it != programs.end(); ++it)
+		if (today > boost::lexical_cast<int>(it->DateEnd().substr(0, 8)) ||
+		    std::find(channels.begin(), channels.end(), it->Channel().Id()) == channels.end())
+			deleteList.push_back(*it);
+
+	total = deleteList.size();
+	if (total > 0)
 	{
-		int today = boost::lexical_cast<int>(boost::gregorian::to_iso_string(boost::gregorian::day_clock::local_day()));
-		std::vector<Program> deleteList;
-
-		for (Programs::iterator it = programs.begin(); it != programs.end(); ++it)
-			if (today > boost::lexical_cast<int>(it->GetDateEnd().substr(0, 8)) ||
-			    std::find(channels.begin(), channels.end(), it->GetChannel().GetId()) == channels.end())
-				deleteList.push_back(*it);
-
-		int total = deleteList.size();
-		if (total > 0)
-		{
-			int percent = 0;
-			int item = 0;
-
-			if (!scanConfig.quiet)
-				std::cerr << "Removing " << total << " old programmes from cache" << std::endl;
-	
-			for (std::vector<Program>::iterator it = deleteList.begin(); it != deleteList.end(); ++it, ++item)
-			{
-				programs.Remove(*it);
-
-				if (!scanConfig.quiet)
-					OutputProgress(item, total, percent);
-			}
-
-			if (!scanConfig.quiet)
-				OutputProgress(item, total, percent);
-		}
-	}
-
-	if (!scanConfig.fast)
-	{
-		int total = 0;
-		int percent = 0;
-		int item = 0;
+		percent = 0;
+		item = 0;
 
 		if (!scanConfig.quiet)
-		{
-			total = programs.size();
-			std::cerr << "Fetching detailed info for " << total << " programmes:" << std::endl;
-		}
+			std::cerr << "Removing " << total << " old programmes from cache" << std::endl;
 
-		for (Programs::iterator it = programs.begin(); it != programs.end(); ++it, ++item)
+		for (std::vector<Program>::iterator it = deleteList.begin(); it != deleteList.end(); ++it, ++item)
 		{
-			if (!it->GetDetailsLoaded())
-			{
-				HttpData httpData;
-				std::stringstream ss;
-				ss << "http://www.tvgids.nl/json/lists/program.php?id=" << it->GetId();
-				std::string programString = httpData.GetUrlContents(ss.str());
-
-				LoadDetailsFromJSON(*it, programString);
-			}
+			programs.Remove(*it);
 
 			if (!scanConfig.quiet)
 				OutputProgress(item, total, percent);
 		}
+
+		if (!scanConfig.quiet)
+			OutputProgress(item, total, percent);
+	}
+
+	total = 0;
+	percent = 0;
+	item = 0;
+
+	if (!scanConfig.quiet)
+	{
+		total = programs.size();
+		std::cerr << "Fetching detailed info for " << total << " programmes:" << std::endl;
+	}
+
+	for (Programs::iterator it = programs.begin(); it != programs.end(); ++it, ++item)
+	{
+		if (!it->DetailsLoaded())
+		{
+			HttpData httpData;
+			std::stringstream ss;
+			ss << "http://www.tvgids.nl/json/lists/program.php?id=" << it->Id();
+			std::string programString = httpData.GetUrlContents(ss.str());
+
+			LoadDetailsFromJSON(*it, programString);
+		}
+
+		if (!scanConfig.quiet)
+			OutputProgress(item, total, percent);
 	}
 
 	if (!scanConfig.quiet)
@@ -136,20 +128,17 @@ Programs TvGidsNL::GetPrograms(Channels channels, const ScanConfig& scanConfig) 
 
 	std::sort(programs.begin(), programs.end());
 
-	if (scanConfig.cache)
+	std::ofstream cacheOutFile(scanConfig.cacheFilename.c_str());
+	if (cacheOutFile.good())
 	{
-		std::ofstream cacheOutFile(scanConfig.cacheFilename.c_str());
-		if (cacheOutFile.good())
-		{
-			boost::archive::text_oarchive cacheOutArchive(cacheOutFile);
-			cacheOutArchive << programs;
-		}
+		boost::archive::text_oarchive cacheOutArchive(cacheOutFile);
+		cacheOutArchive << programs;
 	}
 
 	return programs;
 }
 
-Channels TvGidsNL::LoadFromJSON(std::string json) const
+Channels TvGidsNL::LoadFromJSON(const std::string& json) const
 {
 	std::stringstream jsonStream;
 	jsonStream << "{ \"root\": " << json << " }";
@@ -162,9 +151,9 @@ Channels TvGidsNL::LoadFromJSON(std::string json) const
 	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child("root"))
 	{
 		Channel channel;
-		channel.SetId(val.second.get<int>("id"));
-		channel.SetName(val.second.get<std::string>("name"));
-		channel.SetNameShort(val.second.get<std::string>("name_short"));
+		channel.Id(val.second.get<int>("id"));
+		channel.Name(val.second.get<std::string>("name"));
+		channel.NameShort(val.second.get<std::string>("name_short"));
 
 		channels.push_back(channel);
 	}
@@ -172,13 +161,13 @@ Channels TvGidsNL::LoadFromJSON(std::string json) const
 	return channels;
 }
 
-void TvGidsNL::LoadFromJSON(Programs& programs, Channel channel, std::string json) const
+void TvGidsNL::LoadFromJSON(Programs& programs, const Channel& channel, const std::string& json) const
 {
 	std::stringstream jsonStream;
 	jsonStream << json;
 
 	std::stringstream channelIdStream;
-	channelIdStream << channel.GetId();
+	channelIdStream << channel.Id();
 
 	boost::property_tree::ptree pt;
 	boost::property_tree::json_parser::read_json(jsonStream, pt);
@@ -187,31 +176,31 @@ void TvGidsNL::LoadFromJSON(Programs& programs, Channel channel, std::string jso
 	{
 		Program program(channel);
 
-		program.SetId(val.second.get<int>("db_id"));
+		program.Id(val.second.get<int>("db_id"));
 
-		if (std::find(programs.begin(), programs.end(), program.GetId()) != programs.end())
+		if (std::find(programs.begin(), programs.end(), program.Id()) != programs.end())
 			continue;
 
-		program.SetTitle(val.second.get<std::string>("titel"));
-		program.SetType(val.second.get<std::string>("soort"));
-		program.SetGenre(ConvertGenre(val.second.get<std::string>("genre")));
-		program.SetRating(val.second.get<std::string>("kijkwijzer"));
-		program.SetDateStart(ConvertDate(val.second.get<std::string>("datum_start")));
-		program.SetDateEnd(ConvertDate(val.second.get<std::string>("datum_end")));
+		program.Title(val.second.get<std::string>("titel"));
+		program.Type(val.second.get<std::string>("soort"));
+		program.Genre(ConvertGenre(val.second.get<std::string>("genre")));
+		program.Rating(val.second.get<std::string>("kijkwijzer"));
+		program.DateStart(ConvertDate(val.second.get<std::string>("datum_start")));
+		program.DateEnd(ConvertDate(val.second.get<std::string>("datum_end")));
 
 		boost::optional<int> articleId = val.second.get_optional<int>("artikel_id");
 		if (articleId.is_initialized())
-			program.SetArticleId(articleId.get());
+			program.ArticleId(articleId.get());
 
 		boost::optional<std::string> articleTitle = val.second.get_optional<std::string>("artikel_titel");
 		if (articleTitle.is_initialized())
-			program.SetArticleTitle(articleTitle.get());
+			program.ArticleTitle(articleTitle.get());
 
 		programs.push_back(program);
 	}
 }
 
-void TvGidsNL::LoadDetailsFromJSON(Program& program, std::string json) const
+void TvGidsNL::LoadDetailsFromJSON(Program& program, const std::string& json) const
 {
 	std::stringstream jsonStream;
 	jsonStream << "{ \"root\": [" << json << "] }";
@@ -223,25 +212,25 @@ void TvGidsNL::LoadDetailsFromJSON(Program& program, std::string json) const
 	{
 		boost::optional<std::string> synopsis = val.second.get_optional<std::string>("synop");
 		if (synopsis.is_initialized())
-			program.SetSynopsis(synopsis.get());
+			program.Synopsis(synopsis.get());
 
 		boost::optional<std::string> hosts = val.second.get_optional<std::string>("presentatie");
 		if (hosts.is_initialized())
-			program.SetHosts(hosts.get());
+			program.Hosts(hosts.get());
 
 		boost::optional<std::string> actors = val.second.get_optional<std::string>("acteursnamen_rolverdeling");
 		if (actors.is_initialized())
-			program.SetActors(actors.get());
+			program.Actors(actors.get());
 
 		boost::optional<std::string> director = val.second.get_optional<std::string>("regisseur");
 		if (director.is_initialized())
-			program.SetDirector(director.get());
+			program.Director(director.get());
 	}
 
-	program.SetDetailsLoaded(true);
+	program.DetailsLoaded(true);
 }
 
-std::string TvGidsNL::ConvertGenre(std::string genre) const
+std::string TvGidsNL::ConvertGenre(const std::string& genre) const
 {
 	if (genre == "Nieuws/actualiteiten" || genre == "Actualiteit")
 		return "News / Current affairs";
@@ -277,7 +266,7 @@ std::string TvGidsNL::ConvertGenre(std::string genre) const
 	return genre;
 }
 
-std::string TvGidsNL::ConvertDate(std::string date) const
+std::string TvGidsNL::ConvertDate(const std::string& date) const
 {
 	std::stringstream ss;
 	ss << boost::regex_replace(date, boost::regex("[-: ]"), "") << " +0100";

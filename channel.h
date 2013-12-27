@@ -15,21 +15,21 @@ public:
 
 	std::string GetXML() const;
 
-	void SetId(int id);
-	int GetId() const;
-	void SetInternalId(std::string internalId);
-	std::string GetInternalId() const;
-	void SetName(std::string name);
-	std::string GetName() const;
-	void SetNameShort(std::string nameShort);
-	std::string GetNameShort() const;
-	void SetIconUrl(std::string iconUrl);
-	std::string GetIconUrl() const;
+	void Id(int id);
+	int Id() const;
+	void InternalId(const std::string& internalId);
+	std::string InternalId() const;
+	void Name(const std::string& name);
+	std::string Name() const;
+	void NameShort(const std::string& nameShort);
+	std::string NameShort() const;
+	void IconUrl(const std::string& iconUrl);
+	std::string IconUrl() const;
 
 private:
 	friend class boost::serialization::access;
 	template <class Archive>
-	void serialize(Archive &ar, const unsigned int version)
+	void serialize(Archive& ar, const unsigned int version)
 	{
 		ar & m_id;
 		ar & m_internalId;

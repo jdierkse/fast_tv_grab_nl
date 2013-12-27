@@ -10,7 +10,7 @@
 class Program
 {
 public:
-	Program(Channel channel);
+	Program(const ::Channel& channel);
 
 	bool operator==(const int& value) const;
 	bool operator==(const std::string& value) const;
@@ -18,46 +18,46 @@ public:
 
 	std::string GetXML() const;
 
-	Channel GetChannel() const;
+	::Channel Channel() const;
 
-	void SetId(int id);
-	int GetId() const;
-	void SetInternalId(std::string internalId);
-	std::string GetInternalId() const;
-	void SetTitle(std::string title);
-	std::string GetTitle() const;
-	void SetSubTitle(std::string subTitle);
-	std::string GetSubTitle() const;
-	void SetGenre(std::string genre);
-	std::string GetGenre() const;
-	void SetType(std::string type);
-	std::string GetType() const;
-	void SetRating(std::string rating);
-	std::string GetRating() const;
+	void Id(int id);
+	int Id() const;
+	void InternalId(const std::string& internalId);
+	std::string InternalId() const;
+	void Title(const std::string& title);
+	std::string Title() const;
+	void SubTitle(const std::string& subTitle);
+	std::string SubTitle() const;
+	void Genre(const std::string& genre);
+	std::string Genre() const;
+	void Type(const std::string& type);
+	std::string Type() const;
+	void Rating(const std::string& rating);
+	std::string Rating() const;
 
-	void SetArticleId(int articleId);
-	int GetArticleId() const;
-	void SetArticleTitle(std::string articleTitle);
-	std::string GetArticleTitle() const;
+	void ArticleId(int articleId);
+	int ArticleId() const;
+	void ArticleTitle(const std::string& articleTitle);
+	std::string ArticleTitle() const;
 
-	void SetDateStart(std::string dateStart);
-	std::string GetDateStart() const;
-	void SetDateEnd(std::string dateEnd);
-	std::string GetDateEnd() const;
+	void DateStart(const std::string& dateStart);
+	std::string DateStart() const;
+	void DateEnd(const std::string& dateEnd);
+	std::string DateEnd() const;
 
-	void SetCountry(std::string country);
-	std::string GetCountry() const;
-	void SetSynopsis(std::string synopsis);
-	std::string GetSynopsis() const;
-	void SetHosts(std::string hosts);
-	std::string GetHosts() const;
-	void SetActors(std::string actors);
-	std::string GetActors() const;
-	void SetDirector(std::string director);
-	std::string GetDirector() const;
+	void Country(const std::string& country);
+	std::string Country() const;
+	void Synopsis(const std::string& synopsis);
+	std::string Synopsis() const;
+	void Hosts(const std::string& hosts);
+	std::string Hosts() const;
+	void Actors(const std::string& actors);
+	std::string Actors() const;
+	void Director(const std::string& director);
+	std::string Director() const;
 
-	void SetDetailsLoaded(bool detailsLoaded);
-	bool GetDetailsLoaded() const;
+	void DetailsLoaded(bool detailsLoaded);
+	bool DetailsLoaded() const;
 
 private:
 	Program();
@@ -65,7 +65,7 @@ private:
 private:
 	friend class boost::serialization::access;
 	template <class Archive>
-	void serialize(Archive &ar, const unsigned int version)
+	void serialize(Archive& ar, const unsigned int version)
 	{
 		ar & m_channel;
 		ar & m_detailsLoaded;
@@ -86,7 +86,7 @@ private:
 	}
 
 private:
-	Channel m_channel;
+	::Channel m_channel;
 	bool m_detailsLoaded;
 
 	int m_id;

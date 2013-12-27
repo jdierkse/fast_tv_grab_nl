@@ -56,7 +56,7 @@ size_t Channels::size() const
 	return m_channels.size();
 }
 
-void Channels::push_back(Channel channel)
+void Channels::push_back(const Channel& channel)
 {
 	m_channels.push_back(channel);
 }

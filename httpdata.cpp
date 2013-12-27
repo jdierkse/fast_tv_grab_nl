@@ -1,10 +1,9 @@
+#include <iostream>
 #include "httpdata.h"
-
 
 HttpData::HttpData()
 {
 	curl_global_init(CURL_GLOBAL_ALL);
-	m_curl = curl_easy_init();
 
 	m_userAgents.push_back("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)");
 	m_userAgents.push_back("Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.9) Gecko/20071025 Firefox/2.0.0.9");
@@ -24,32 +23,40 @@ HttpData::HttpData()
 	m_userAgents.push_back("Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:25.0) Gecko/20100101 Firefox/25.0");
 	m_userAgents.push_back("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; .NET4.0E)");
 	m_userAgents.push_back("Mozilla/4.0 (compatible; MSIE 6.1; Windows NT)");
+
+	initialize_locks();
 }
 
 HttpData::~HttpData()
 {
-	curl_easy_cleanup(m_curl);
+	free_locks();
 	curl_global_cleanup();
 }
 
-std::string HttpData::GetUrlContents(std::string url)
+std::string HttpData::GetUrlContents(const std::string& url)
 {
-	g_http_data.clear();
+	std::string buffer;
+	CURL* curl = curl_easy_init();
 
-	curl_easy_setopt(m_curl, CURLOPT_USERAGENT, m_userAgents[rand() % m_userAgents.size()].c_str());
-	curl_easy_setopt(m_curl, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, &writeCallback);
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, m_userAgents[rand() % m_userAgents.size()].c_str());
+	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &WriteCallback);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
-	curl_easy_perform(m_curl);
+	curl_easy_perform(curl);
+	curl_easy_cleanup(curl);
 
-	return g_http_data;
+	return buffer;
 }
 
-size_t HttpData::writeCallback(char* buf, size_t size, size_t nmemb, void* up)
+size_t HttpData::WriteCallback(char* data, size_t size, size_t nmemb, std::string* writerData)
 {
-	for (int i = 0; i < size * nmemb; i++)
-		g_http_data.push_back(buf[i]);
+	if (writerData == NULL)
+		return 0;
 
+	writerData->append(data, size * nmemb);
 	return size * nmemb;
 }
 

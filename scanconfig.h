@@ -7,12 +7,10 @@
 struct ScanConfig
 {
 public:
-	ScanConfig(int days, bool fast, bool quiet, bool cache, std::string cacheFilename);
+	ScanConfig(int days, bool quiet, const std::string& cacheFilename);
 
 	int days;
-	bool fast;
 	bool quiet;
-	bool cache;
 	std::string cacheFilename;
 };
 

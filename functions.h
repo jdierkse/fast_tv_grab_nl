@@ -7,8 +7,8 @@
 
 
 int OutputProgress(int currentItem, int totalItems, int previousPercentage);
-std::vector<std::string> SplitString(std::string string, std::string delimiter);
-std::string FixHTMLAndSpecialCharacters(std::string string);
+std::vector<std::string> SplitString(const std::string& string, const std::string& delimiter);
+std::string FixHTMLAndSpecialCharacters(const std::string& string);
 
 #endif // FUNCTIONS_H
 

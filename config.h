@@ -12,25 +12,25 @@ public:
 	friend class ConfigurationFile;
 	Configuration();
 
-	bool GetValid() const;
-	Channels GetChannels() const;
+	bool Valid() const;
+	::Channels Channels() const;
 
 protected:
-	void SetValid(bool valid);
-	void SetChannels(Channels channels);
+	void Valid(bool valid);
+	void Channels(const ::Channels& channels);
 
 private:
 	bool m_valid;
-	Channels m_channels;
+	::Channels m_channels;
 };
 
 class ConfigurationFile
 {
 public:
-	ConfigurationFile(std::string filename);
+	ConfigurationFile(const std::string& filename);
 
 public:
-	void SetChannels(Channels channels);
+	void Channels(const ::Channels& channels);
 
 	Configuration Read(const Provider& provider);
 	void Write();

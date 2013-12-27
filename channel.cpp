@@ -14,7 +14,7 @@ bool Channel::operator==(int value) const
 
 bool Channel::operator<(const Channel& other) const
 {
-	return (m_id < other.GetId());
+	return (m_id < other.Id());
 }
 
 std::string Channel::GetXML() const
@@ -32,52 +32,52 @@ std::string Channel::GetXML() const
 	return ss.str();
 }
 
-void Channel::SetId(int id)
+void Channel::Id(int id)
 {
 	m_id = id;
 }
 
-int Channel::GetId() const
+int Channel::Id() const
 {
 	return m_id;
 }
 
-void Channel::SetInternalId(std::string internalId)
+void Channel::InternalId(const std::string& internalId)
 {
 	m_internalId = internalId;
 }
 
-std::string Channel::GetInternalId() const
+std::string Channel::InternalId() const
 {
 	return m_internalId;
 }
 
-void Channel::SetName(std::string name)
+void Channel::Name(const std::string& name)
 {
 	m_name = FixHTMLAndSpecialCharacters(name);
 }
 
-std::string Channel::GetName() const
+std::string Channel::Name() const
 {
 	return m_name;
 }
 
-void Channel::SetNameShort(std::string nameShort)
+void Channel::NameShort(const std::string& nameShort)
 {
 	m_nameShort = FixHTMLAndSpecialCharacters(nameShort);
 }
 
-std::string Channel::GetNameShort() const
+std::string Channel::NameShort() const
 {
 	return m_nameShort;
 }
 
-void Channel::SetIconUrl(std::string iconUrl)
+void Channel::IconUrl(const std::string& iconUrl)
 {
 	m_iconUrl = iconUrl;
 }
 
-std::string Channel::GetIconUrl() const
+std::string Channel::IconUrl() const
 {
 	return m_iconUrl;
 }

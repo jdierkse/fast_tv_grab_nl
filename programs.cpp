@@ -10,9 +10,9 @@ std::string Programs::GetXML() const
 	return ss.str();
 }
 
-bool Programs::Remove(Program program)
+bool Programs::Remove(const Program& program)
 {
-	Programs::iterator it = std::find(m_programs.begin(), m_programs.end(), program.GetId());
+	Programs::iterator it = std::find(m_programs.begin(), m_programs.end(), program.Id());
 	if (it != m_programs.end())
 	{
 		m_programs.erase(it);
@@ -66,7 +66,7 @@ size_t Programs::size() const
 	return m_programs.size();
 }
 
-void Programs::push_back(Program program)
+void Programs::push_back(const Program& program)
 {
 	m_programs.push_back(program);
 }

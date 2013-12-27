@@ -12,7 +12,7 @@ class Programs
 {
 public:
 	std::string GetXML() const;
-	bool Remove(Program program);
+	bool Remove(const Program& program);
 
 	typedef std::vector<Program>::iterator iterator;
 	typedef std::vector<Program>::const_iterator const_iterator;
@@ -29,12 +29,12 @@ public:
 	const_reverse_iterator rend() const;
 	size_t size() const;
 
-	void push_back(Program program);
+	void push_back(const Program& program);
 
 private:
         friend class boost::serialization::access;
 	template <class Archive>
-	void serialize(Archive &ar, const unsigned int version)
+	void serialize(Archive& ar, const unsigned int version)
 	{
 		ar & m_programs;
 	}

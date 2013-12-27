@@ -26,11 +26,11 @@ public:
 	const_reverse_iterator rend() const;
 	size_t size() const;
 
-	void push_back(Channel channel);
+	void push_back(const Channel& channel);
 
 private:
 	std::vector<Channel> m_channels;
 };
 
-#endif // CHANNELS_h
+#endif // CHANNELS_H
 

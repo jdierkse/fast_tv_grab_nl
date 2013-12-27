@@ -30,18 +30,18 @@ int OutputProgress(int currentItem, int totalItems, int previousPercentage)
 	return currentPercentage;
 }
 
-std::vector<std::string> SplitString(std::string string, std::string delimiter)
+std::vector<std::string> SplitString(const std::string& string, const std::string& delimiter)
 {
 	std::vector<std::string> strings;
 	boost::algorithm::split_regex(strings, string, boost::regex(delimiter));
 	return strings;
 }
 
-std::string FixHTMLAndSpecialCharacters(std::string string)
+std::string FixHTMLAndSpecialCharacters(const std::string& string)
 {
-	string = boost::regex_replace(string, boost::regex("<[a-zA-Z1-9\\/ ]*>"), "");
-	string = boost::regex_replace(string, boost::regex("\r"), "");
-	string = boost::regex_replace(string, boost::regex("&"), "&amp;");
-	return string;
+	std::string str = boost::regex_replace(string, boost::regex("<[a-zA-Z1-9\\/ ]*>"), "");
+	str = boost::regex_replace(string, boost::regex("\r"), "");
+	str = boost::regex_replace(string, boost::regex("&"), "&amp;");
+	return str;
 }
 
