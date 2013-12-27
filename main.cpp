@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 
 		boost::shared_ptr<Provider> pProvider;
 		int days = 4;
-		bool quiet = true;
+		bool quiet = false;
 
 		if (vm.count("days"))
 		{
