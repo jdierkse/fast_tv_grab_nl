@@ -6,9 +6,9 @@ Fast TV channel information grabber
 fast_tv_grab_nl is a C++ TV channel information grabber.  
 The functionality is similar to tv_grab_nl_PY (https://code.google.com/p/tvgrabnlpy).
 
-fast_tv_grab_nl grabs TV channel and programme information from two possible providers;
-*http://www.tvgids.nl
-*http://www.horizon.tv
+fast_tv_grab_nl grabs TV channel and programme information from two possible providers:
+* http://www.tvgids.nl
+* http://www.horizon.tv
 
 Information is converted into the XMLTV format.  
 Programme categories are converted to the categories known by TVHeadend.

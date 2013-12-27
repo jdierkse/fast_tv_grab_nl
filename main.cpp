@@ -8,7 +8,6 @@
 #include <boost/program_options.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <curl/curl.h>
 #include "channels.h"
 #include "config.h"
 #include "programs.h"
@@ -96,7 +95,7 @@ int main(int argc, char** argv)
 
 		boost::shared_ptr<Provider> pProvider;
 		int days = 4;
-		bool cache = true;
+		bool quiet = true;
 
 		if (vm.count("days"))
 		{
