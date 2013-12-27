@@ -63,7 +63,8 @@ Programs UPCNL::GetPrograms(Channels& channels, const ScanConfig& scanConfig)
 		for (std::vector<std::pair<Channel, std::string> >::iterator it = m_programs.begin(); it != m_programs.end(); ++it, ++item)
 		{
 			LoadFromJSON(programs, it->first, it->second);
-			OutputProgress(item, total, percent);
+			if (!scanConfig.quiet)
+				OutputProgress(item, total, percent);
 		}
 	}
 
