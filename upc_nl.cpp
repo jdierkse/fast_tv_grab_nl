@@ -235,7 +235,9 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 	    genre == "action" || genre == "comedy" ||
 	    genre == "drama" || genre == "horror" ||
 	    genre == "romance" || genre == "sci-fi" ||
-	    genre == "thriller")
+	    genre == "thriller" || genre == "historical" ||
+	    genre == "adventure" || genre == "musical" ||
+	    genre == "western")
 		return "Movie / Drama";
 	if (genre == "educational")
 		return "Education / Science / Factual topics";
