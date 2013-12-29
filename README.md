@@ -27,6 +27,7 @@ Dependencies:
 * boost-serialization
 * boost-system
 * boost-thread
+* openssl-dev
 * libcurl-dev
 
 Usage:
