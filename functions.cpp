@@ -40,8 +40,10 @@ std::vector<std::string> SplitString(const std::string& string, const std::strin
 std::string FixHTMLAndSpecialCharacters(const std::string& string)
 {
 	std::string str = boost::regex_replace(string, boost::regex("<[a-zA-Z1-9\\/ ]*>"), "");
-	str = boost::regex_replace(string, boost::regex("\r"), "");
-	str = boost::regex_replace(string, boost::regex("&"), "&amp;");
+	str = boost::regex_replace(str, boost::regex("\r"), "");
+	str = boost::regex_replace(str, boost::regex("&"), "&amp;");
+	str = boost::regex_replace(str, boost::regex("<"), "&lt;");
+	str = boost::regex_replace(str, boost::regex(">"), "&gt;");
 	return str;
 }
 
