@@ -225,11 +225,16 @@ void UPCNL::LoadFromJSON(Programs& programs, const Channel& channel, const std::
 
 std::string UPCNL::ConvertGenre(const std::string& genre) const
 {
-	if (genre == "news")
+	if (genre == "news" || genre == "nieuws" ||
+	    genre == "nieuws/nieuws" || genre == "nieuws/nieuws/discussie" ||
+	    genre == "nieuws/nieuws/documentaire")
 		return "News / Current affairs";
-	if (genre == "show|game show" || genre == "entertainment")
+	if (genre == "show|game show" || genre == "entertainment" ||
+	    genre == "show|spelshow" || genre == "show|spelshow/show" ||
+	    genre == "show|spelshow/show/talkshow")
 		return "Show / Game show";
-	if (genre == "kids|youth")
+	if (genre == "kids|youth" || genre == "kids|jeugd" ||
+	    genre == "kids|jeugd/kids|jeugd")
 		return "Children's / Youth programmes";
 	if (genre == "movie" || genre == "TV drama" ||
 	    genre == "action" || genre == "comedy" ||
@@ -237,20 +242,26 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 	    genre == "romance" || genre == "sci-fi" ||
 	    genre == "thriller" || genre == "historical" ||
 	    genre == "adventure" || genre == "musical" ||
-	    genre == "western")
+	    genre == "western" || genre == "romantiek" ||
+	    genre == "komedie" || genre == "actie" ||
+	    genre == "speelfilm" || genre == "avontuur")
 		return "Movie / Drama";
-	if (genre == "educational")
+	if (genre == "educational" || genre == "educatie")
 		return "Education / Science / Factual topics";
-	if (genre == "sports")
+	if (genre == "sports" || genre == "sport" ||
+	    genre == "sport/sport")
 		return "Sports";
 	if (genre == "leisure" || genre == "adult" ||
-	    genre == "special")
+	    genre == "special" || genre == "vrije tijd" ||
+	    genre == "vrije tijd/vrije tijd" || genre == "vrije tijd/vrije tijd/gezondheid" ||
+	    genre == "erotiek")
 		return "Leisure hobbies";
-	if (genre == "music|dance")
+	if (genre == "music|dance" || genre == "muziek|dans")
 		return "Music / Ballet / Dance";
-	if (genre == "social|political")
+	if (genre == "social|political" || genre == "maatschappij" ||
+	    genre == "maatschappij/maatschappelijk")
 		return "Social / Political issues / Economics";
-	if (genre == "arts|culture")
+	if (genre == "arts|culture" || genre == "kunst|cultuur")
 		return "Arts / Culture (without music)";
 
 	return genre;
