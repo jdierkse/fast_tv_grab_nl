@@ -270,8 +270,8 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 std::string UPCNL::ConvertDate(int date) const
 {
 	std::stringstream ss;
-	boost::posix_time::ptime time = boost::date_time::c_local_adjustor<boost::posix_time::ptime>::utc_to_local(boost::posix_time::from_time_t(date));
-	ss << boost::regex_replace(boost::posix_time::to_iso_string(time), boost::regex("[A-Z]"), "") << " +0100";
+	boost::posix_time::ptime time = boost::posix_time::from_time_t(date);
+	ss << boost::regex_replace(boost::posix_time::to_iso_string(time), boost::regex("[A-Z]"), "") << " UTC";
 
 	return ss.str();
 }
