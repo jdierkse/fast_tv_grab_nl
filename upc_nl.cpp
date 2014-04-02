@@ -231,10 +231,10 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 		return "News / Current affairs";
 	if (genre == "show|game show" || genre == "entertainment" ||
 	    genre == "show|spelshow" || genre == "show|spelshow/show" ||
-	    genre == "show|spelshow/show/talkshow")
+	    genre == "show|spelshow/show/talkshow" || genre == "show/spelshow/show")
 		return "Show / Game show";
 	if (genre == "kids|youth" || genre == "kids|jeugd" ||
-	    genre == "kids|jeugd/kids|jeugd")
+	    genre == "kids|jeugd/kids|jeugd" || genre == "kids/jeugd/kids/jeugd")
 		return "Children's / Youth programmes";
 	if (genre == "movie" || genre == "TV drama" ||
 	    genre == "action" || genre == "comedy" ||
@@ -244,9 +244,11 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 	    genre == "adventure" || genre == "musical" ||
 	    genre == "western" || genre == "romantiek" ||
 	    genre == "komedie" || genre == "actie" ||
-	    genre == "speelfilm" || genre == "avontuur")
+	    genre == "speelfilm" || genre == "avontuur" ||
+	    genre == "melodrama")
 		return "Movie / Drama";
-	if (genre == "educational" || genre == "educatie")
+	if (genre == "educational" || genre == "educatie" ||
+	    genre == "educatie/educatie")
 		return "Education / Science / Factual topics";
 	if (genre == "sports" || genre == "sport" ||
 	    genre == "sport/sport")
@@ -256,12 +258,14 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 	    genre == "vrije tijd/vrije tijd" || genre == "vrije tijd/vrije tijd/gezondheid" ||
 	    genre == "erotiek")
 		return "Leisure hobbies";
-	if (genre == "music|dance" || genre == "muziek|dans")
+	if (genre == "music|dance" || genre == "muziek|dans" ||
+	    genre == "muziek")
 		return "Music / Ballet / Dance";
 	if (genre == "social|political" || genre == "maatschappij" ||
 	    genre == "maatschappij/maatschappelijk")
 		return "Social / Political issues / Economics";
-	if (genre == "arts|culture" || genre == "kunst|cultuur")
+	if (genre == "arts|culture" || genre == "kunst|cultuur" ||
+	    genre == "kunst/cultuur/kunst/cultuur")
 		return "Arts / Culture (without music)";
 
 	return genre;
