@@ -231,10 +231,12 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 		return "News / Current affairs";
 	if (genre == "show|game show" || genre == "entertainment" ||
 	    genre == "show|spelshow" || genre == "show|spelshow/show" ||
-	    genre == "show|spelshow/show/talkshow" || genre == "show/spelshow/show")
+	    genre == "show|spelshow/show/talkshow" || genre == "show/spelshow/show" ||
+	    genre == "show")
 		return "Show / Game show";
 	if (genre == "kids|youth" || genre == "kids|jeugd" ||
-	    genre == "kids|jeugd/kids|jeugd" || genre == "kids/jeugd/kids/jeugd")
+	    genre == "kids|jeugd/kids|jeugd" || genre == "kids/jeugd/kids/jeugd" ||
+	    genre == "kids/jeugd")
 		return "Children's / Youth programmes";
 	if (genre == "movie" || genre == "TV drama" ||
 	    genre == "action" || genre == "comedy" ||
@@ -245,7 +247,7 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 	    genre == "western" || genre == "romantiek" ||
 	    genre == "komedie" || genre == "actie" ||
 	    genre == "speelfilm" || genre == "avontuur" ||
-	    genre == "melodrama")
+	    genre == "melodrama" || genre == "historisch")
 		return "Movie / Drama";
 	if (genre == "educational" || genre == "educatie" ||
 	    genre == "educatie/educatie")
@@ -262,10 +264,10 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 	    genre == "muziek")
 		return "Music / Ballet / Dance";
 	if (genre == "social|political" || genre == "maatschappij" ||
-	    genre == "maatschappij/maatschappelijk")
+	    genre == "maatschappij/maatschappelijk" || genre == "maatschappelijk")
 		return "Social / Political issues / Economics";
 	if (genre == "arts|culture" || genre == "kunst|cultuur" ||
-	    genre == "kunst/cultuur/kunst/cultuur")
+	    genre == "kunst/cultuur/kunst/cultuur" || genre == "kunst/cultuur")
 		return "Arts / Culture (without music)";
 
 	return genre;
