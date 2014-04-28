@@ -144,7 +144,15 @@ void UPCNL::LoadFromJSON(Programs& programs, const Channel& channel, const std::
 	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child("listings"))
 	{
 		Program program(channel);
-		boost::property_tree::ptree p = val.second.get_child("program");
+		boost::property_tree::ptree p;
+		try
+		{
+			p = val.second.get_child("program");
+		}
+		catch (...)
+		{
+			continue;
+		}
 
 		program.InternalId(p.get<std::string>("id"));
 
