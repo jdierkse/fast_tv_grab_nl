@@ -235,16 +235,16 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 {
 	if (genre == "news" || genre == "nieuws" ||
 	    genre == "nieuws/nieuws" || genre == "nieuws/nieuws/discussie" ||
-	    genre == "nieuws/nieuws/documentaire")
+	    genre == "nieuws/nieuws/documentaire" || genre == "NIEUWS")
 		return "News / Current affairs";
 	if (genre == "show|game show" || genre == "entertainment" ||
 	    genre == "show|spelshow" || genre == "show|spelshow/show" ||
 	    genre == "show|spelshow/show/talkshow" || genre == "show/spelshow/show" ||
-	    genre == "show")
+	    genre == "show" || genre == "SHOW")
 		return "Show / Game show";
 	if (genre == "kids|youth" || genre == "kids|jeugd" ||
 	    genre == "kids|jeugd/kids|jeugd" || genre == "kids/jeugd/kids/jeugd" ||
-	    genre == "kids/jeugd")
+	    genre == "kids/jeugd" || genre == "KIDS/JEUGD")
 		return "Children's / Youth programmes";
 	if (genre == "movie" || genre == "TV drama" ||
 	    genre == "action" || genre == "comedy" ||
@@ -255,27 +255,37 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 	    genre == "western" || genre == "romantiek" ||
 	    genre == "komedie" || genre == "actie" ||
 	    genre == "speelfilm" || genre == "avontuur" ||
-	    genre == "melodrama" || genre == "historisch")
+	    genre == "melodrama" || genre == "historisch" ||
+	    genre == "ACTIE" || genre == "AVONTUUR" ||
+	    genre == "DRAMA" || genre == "HISTORISCH" ||
+	    genre == "HORROR" || genre == "KOMEDIE" ||
+	    genre == "ROMANTIEK" || genre == "SCI-FI" ||
+	    genre == "SPEELFILM" || genre == "THRILLER" ||
+	    genre == "TV DRAMA" || genre == "WESTERN")
 		return "Movie / Drama";
 	if (genre == "educational" || genre == "educatie" ||
-	    genre == "educatie/educatie")
+	    genre == "educatie/educatie" || genre == "EDUCATIE")
 		return "Education / Science / Factual topics";
 	if (genre == "sports" || genre == "sport" ||
-	    genre == "sport/sport")
+	    genre == "sport/sport" || genre == "SPORT")
 		return "Sports";
 	if (genre == "leisure" || genre == "adult" ||
 	    genre == "special" || genre == "vrije tijd" ||
 	    genre == "vrije tijd/vrije tijd" || genre == "vrije tijd/vrije tijd/gezondheid" ||
-	    genre == "erotiek")
+	    genre == "erotiek" || genre == "EROTIEK" ||
+	    genre == "SPECIAL" || genre == "VRIJE TIJD")
 		return "Leisure hobbies";
 	if (genre == "music|dance" || genre == "muziek|dans" ||
-	    genre == "muziek")
+	    genre == "muziek" || genre == "MUSICAL" ||
+	    genre == "MUZIEK")
 		return "Music / Ballet / Dance";
 	if (genre == "social|political" || genre == "maatschappij" ||
-	    genre == "maatschappij/maatschappelijk" || genre == "maatschappelijk")
+	    genre == "maatschappij/maatschappelijk" || genre == "maatschappelijk" ||
+	    genre == "MAATSCHAPPELIJK")
 		return "Social / Political issues / Economics";
 	if (genre == "arts|culture" || genre == "kunst|cultuur" ||
-	    genre == "kunst/cultuur/kunst/cultuur" || genre == "kunst/cultuur")
+	    genre == "kunst/cultuur/kunst/cultuur" || genre == "kunst/cultuur" ||
+	    genre == "KUNST/CULTUUR")
 		return "Arts / Culture (without music)";
 
 	return genre;

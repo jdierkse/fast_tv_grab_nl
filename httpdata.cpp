@@ -36,17 +36,28 @@ HttpData::~HttpData()
 std::string HttpData::GetUrlContents(const std::string& url)
 {
 	std::string buffer;
-	CURL* curl = curl_easy_init();
 
-	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, m_userAgents[rand() % m_userAgents.size()].c_str());
-	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &WriteCallback);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+	try
+	{
+		CURL* curl = curl_easy_init();
 
-	curl_easy_perform(curl);
-	curl_easy_cleanup(curl);
+		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+		curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_easy_setopt(curl, CURLOPT_USERAGENT, m_userAgents[rand() % m_userAgents.size()].c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &WriteCallback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+
+		curl_easy_perform(curl);
+		curl_easy_cleanup(curl);
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Error encountered while retrieving " << url << std::endl;
+		std::cerr << "Exception caught: " << e.what() << std::endl;
+	}
 
 	return buffer;
 }
