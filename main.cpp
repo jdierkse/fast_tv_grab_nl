@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 			{
 				pProvider = boost::make_shared<UPCNL>();
 			}
-			else if(provider != "tvgids")
+			else if(provider == "tvgids")
 			{
 				pProvider = boost::make_shared<TvGidsNL>();
 			}
@@ -177,4 +177,3 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-

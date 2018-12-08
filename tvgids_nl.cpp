@@ -2,6 +2,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
@@ -14,7 +15,7 @@
 Channels TvGidsNL::GetChannels() const
 {
 	HttpData httpData;
-	std::string channelsString = httpData.GetUrlContents("http://www.tvgids.nl/json/lists/channels.php");
+	std::string channelsString = httpData.GetUrlContents("http://json.tvgids.nl/v4/channels");
 
 	Channels channels = LoadFromJSON(channelsString);
 	std::sort(channels.begin(), channels.end());
@@ -54,11 +55,11 @@ Programs TvGidsNL::GetPrograms(Channels& channels, const ScanConfig& scanConfig)
 		if (!scanConfig.quiet)
 			OutputProgress(item, total, percent);
 
-		for (int day = 1; day <= days; ++day)
+		for (int day = 0; day < days; ++day)
 		{
 			HttpData httpData;
 			std::stringstream ss;
-			ss << "http://www.tvgids.nl/json/lists/programs.php?channels=" << it->Id() << "&day=" << day;
+			ss << "http://json.tvgids.nl/v4/programs/?channels=" << it->Id() << "&day=" << day;
 			std::string programsString = httpData.GetUrlContents(ss.str());
 
 			LoadFromJSON(programs, *it, programsString);
@@ -97,35 +98,6 @@ Programs TvGidsNL::GetPrograms(Channels& channels, const ScanConfig& scanConfig)
 			OutputProgress(item, total, percent);
 	}
 
-	total = 0;
-	percent = 0;
-	item = 0;
-
-	if (!scanConfig.quiet)
-	{
-		total = programs.size();
-		std::cerr << "Fetching detailed info for " << total << " programmes:" << std::endl;
-	}
-
-	for (Programs::iterator it = programs.begin(); it != programs.end(); ++it, ++item)
-	{
-		if (!it->DetailsLoaded())
-		{
-			HttpData httpData;
-			std::stringstream ss;
-			ss << "http://www.tvgids.nl/json/lists/program.php?id=" << it->Id();
-			std::string programString = httpData.GetUrlContents(ss.str());
-
-			LoadDetailsFromJSON(*it, programString);
-		}
-
-		if (!scanConfig.quiet)
-			OutputProgress(item, total, percent);
-	}
-
-	if (!scanConfig.quiet)
-		OutputProgress(item, total, percent);
-
 	std::sort(programs.begin(), programs.end());
 
 	std::ofstream cacheOutFile(scanConfig.cacheFilename.c_str());
@@ -141,19 +113,19 @@ Programs TvGidsNL::GetPrograms(Channels& channels, const ScanConfig& scanConfig)
 Channels TvGidsNL::LoadFromJSON(const std::string& json) const
 {
 	std::stringstream jsonStream;
-	jsonStream << "{ \"root\": " << json << " }";
+	jsonStream << json;
 
 	boost::property_tree::ptree pt;
 	boost::property_tree::json_parser::read_json(jsonStream, pt);
 
 	Channels channels;
 
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child("root"))
+	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child("data"))
 	{
 		Channel channel;
-		channel.Id(val.second.get<int>("id"));
-		channel.Name(val.second.get<std::string>("name"));
-		channel.NameShort(val.second.get<std::string>("name_short"));
+		channel.Id(val.second.get<int>("ch_id"));
+		channel.Name(val.second.get<std::string>("ch_name"));
+		channel.NameShort(val.second.get<std::string>("ch_short"));
 
 		channels.push_back(channel);
 	}
@@ -172,7 +144,7 @@ void TvGidsNL::LoadFromJSON(Programs& programs, const Channel& channel, const st
 	boost::property_tree::ptree pt;
 	boost::property_tree::json_parser::read_json(jsonStream, pt);
 
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child(channelIdStream.str().c_str()))
+	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child("data").get_child(channelIdStream.str().c_str()).get_child("prog"))
 	{
 		Program program(channel);
 
@@ -181,97 +153,55 @@ void TvGidsNL::LoadFromJSON(Programs& programs, const Channel& channel, const st
 		if (std::find(programs.begin(), programs.end(), program.Id()) != programs.end())
 			continue;
 
-		program.Title(val.second.get<std::string>("titel"));
-		program.Type(val.second.get<std::string>("soort"));
-		program.Genre(ConvertGenre(val.second.get<std::string>("genre")));
-		program.Rating(val.second.get<std::string>("kijkwijzer"));
-		program.DateStart(ConvertDate(val.second.get<std::string>("datum_start")));
-		program.DateEnd(ConvertDate(val.second.get<std::string>("datum_end")));
+		program.Title(val.second.get<std::string>("title"));
+		program.DateStart(ConvertDate(val.second.get<int>("s")));
+		program.DateEnd(ConvertDate(val.second.get<int>("e")));
 
-		boost::optional<int> articleId = val.second.get_optional<int>("artikel_id");
-		if (articleId.is_initialized())
-			program.ArticleId(articleId.get());
+		boost::optional<int> genre = val.second.get_optional<int>("g_id");
+		if (genre.is_initialized())
+			program.Genre(ConvertGenre(genre.get()));
 
-		boost::optional<std::string> articleTitle = val.second.get_optional<std::string>("artikel_titel");
-		if (articleTitle.is_initialized())
-			program.ArticleTitle(articleTitle.get());
+		boost::optional<std::string> synopsis = val.second.get_optional<std::string>("descr");
+		if (synopsis.is_initialized())
+			program.Synopsis(synopsis.get());
 
 		programs.push_back(program);
 	}
 }
 
-void TvGidsNL::LoadDetailsFromJSON(Program& program, const std::string& json) const
+std::string TvGidsNL::ConvertGenre(int genre) const
 {
-	std::stringstream jsonStream;
-	jsonStream << "{ \"root\": [" << json << "] }";
-
-	boost::property_tree::ptree pt;
-	boost::property_tree::json_parser::read_json(jsonStream, pt);
-
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &val, pt.get_child("root"))
-	{
-		boost::optional<std::string> synopsis = val.second.get_optional<std::string>("synop");
-		if (synopsis.is_initialized())
-			program.Synopsis(synopsis.get());
-
-		boost::optional<std::string> hosts = val.second.get_optional<std::string>("presentatie");
-		if (hosts.is_initialized())
-			program.Hosts(hosts.get());
-
-		boost::optional<std::string> actors = val.second.get_optional<std::string>("acteursnamen_rolverdeling");
-		if (actors.is_initialized())
-			program.Actors(actors.get());
-
-		boost::optional<std::string> director = val.second.get_optional<std::string>("regisseur");
-		if (director.is_initialized())
-			program.Director(director.get());
-	}
-
-	program.DetailsLoaded(true);
-}
-
-std::string TvGidsNL::ConvertGenre(const std::string& genre) const
-{
-	if (genre == "Nieuws/actualiteiten" || genre == "Actualiteit")
+	if (genre == 13)
 		return "News / Current affairs";
-	if (genre == "Amusement" || genre == "Animatie" ||
-	    genre == "Comedy")
+	if (genre ==  1 || genre ==  2 ||
+	    genre ==  3)
 		return "Show / Game show";
-	if (genre == "Jeugd")
+	if (genre == 8)
 		return "Children's / Youth programmes";
-	if (genre == "Serie/soap" || genre == "Film" ||
-	    genre == "Komedie" || genre == "Actiefilm" ||
-	    genre == "Tekenfilm" || genre == "Animatiekomedie" ||
-	    genre == "Thriller" || genre == "Familiekomedie" ||
-	    genre == "Romantische Komedie" || genre == "Serie" ||
-	    genre == "Misdaad")
+	if (genre ==  6 || genre == 10 ||
+			genre == 16)
 		return "Movie / Drama";
-	if (genre == "Info" || genre == "Informatief" ||
-	    genre == "Documentaire" || genre == "Wetenschap" ||
-	    genre == "Natuur" || genre == "Educatief")
+	if (genre ==  4 || genre ==  7 ||
+	    genre == 12 || genre == 19)
 		return "Education / Science / Factual topics";
-	if (genre == "Sport")
+	if (genre == 17)
 		return "Sports";
-	if (genre == "Erotiek")
-		return "Leisure hobbies";
-	if (genre == "Muziek")
+	if (genre == 11)
 		return "Music / Ballet / Dance";
-	if (genre == "Religieus")
+	if (genre == 15)
 		return "Social / Political issues / Economics";
-	if (genre == "Kunst/Cultuur" || genre == "Kunst/cultuur" || genre == "Cultuur")
+	if (genre ==  9 || genre == 18)
 		return "Arts / Culture (without music)";
-	if (genre == "Overig" || genre == "Overige")
-		return "Other";
+	//if (genre == 21 || genre == 23)
 
-	return genre;
+	return "Other";
 }
 
-std::string TvGidsNL::ConvertDate(const std::string& date) const
+std::string TvGidsNL::ConvertDate(int date) const
 {
 	std::stringstream ss;
-	ss << boost::regex_replace(date, boost::regex("[-: ]"), "") << " +0100";
+	boost::posix_time::ptime time = boost::posix_time::from_time_t(date);
+	ss << boost::regex_replace(boost::posix_time::to_iso_string(time), boost::regex("[A-Z]"), "") << " UTC";
 
 	return ss.str();
 }
-
-
