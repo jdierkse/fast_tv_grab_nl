@@ -12,7 +12,7 @@
 #include "config.h"
 #include "programs.h"
 #include "tvgids_nl.h"
-#include "upc_nl.h"
+#include "horizon_nl.h"
 #include "functions.h"
 
 
@@ -24,7 +24,7 @@ void PrintHelp()
 {
 	std::cout << "Usage: fast_tv_grab_nl [options]" << std::endl;
 	std::cout << "Options:" << std::endl;
-	std::cout << "  --provider [upc,tvgids] -p [upc,tvgids] Provider to use" << std::endl;
+	std::cout << "  --provider [horizon,tvgids] -p [horizon,tvgids] Provider to use" << std::endl;
 	std::cout << "  --days N -d N                           Number of days to grab (default: 4)" << std::endl;
 	std::cout << "  --quiet -q                              Supress progress output" << std::endl;
 	std::cout << "  --clearcache                            Clear the cache file" << std::endl;
@@ -128,9 +128,9 @@ int main(int argc, char** argv)
 		if (vm.count("provider"))
 		{
 			std::string provider = vm["provider"].as<std::string>();
-			if (provider == "upc")
+			if (provider == "horizon")
 			{
-				pProvider = boost::make_shared<UPCNL>();
+				pProvider = boost::make_shared<HorizonNL>();
 			}
 			else if(provider == "tvgids")
 			{

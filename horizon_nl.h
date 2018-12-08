@@ -1,5 +1,5 @@
-#ifndef UPC_NL_H
-#define UPC_NL_H
+#ifndef HORIZON_NL_H
+#define HORIZON_NL_H
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -7,10 +7,10 @@
 #include "threadpool.h"
 #include "provider.h"
 
-class UPCNL : public Provider
+class HorizonNL : public Provider
 {
 public:
-	UPCNL();
+	HorizonNL();
 
 	virtual Channels GetChannels() const;
 	virtual Programs GetPrograms(Channels& channels, const ScanConfig& scanConfig);
@@ -28,5 +28,4 @@ private:
 	std::vector<std::pair<Channel, std::string> > m_programs;
 };
 
-#endif // UPC_NL_H
-
+#endif // HORIZON_NL_H

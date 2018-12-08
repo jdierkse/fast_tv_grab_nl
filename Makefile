@@ -15,8 +15,8 @@ endif
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) $< -o $@
 
-fast_tv_grab_nl: main.cpp httpdata.o channel.o channels.o config.o program.o programs.o scanconfig.o tvgids_nl.o upc_nl.o functions.o
-	g++ -o fast_tv_grab_nl main.cpp httpdata.o channel.o channels.o config.o program.o programs.o scanconfig.o tvgids_nl.o upc_nl.o functions.o `curl-config --libs` $(LFLAGS) $(CFLAGS)
+fast_tv_grab_nl: main.cpp httpdata.o channel.o channels.o config.o program.o programs.o scanconfig.o tvgids_nl.o horizon_nl.o functions.o
+	g++ -o fast_tv_grab_nl main.cpp httpdata.o channel.o channels.o config.o program.o programs.o scanconfig.o tvgids_nl.o horizon_nl.o functions.o `curl-config --libs` $(LFLAGS) $(CFLAGS)
 
 httpdata.o: httpdata.cpp httpdata.h
 
@@ -34,7 +34,7 @@ scanconfig.o: scanconfig.cpp scanconfig.h
 
 tvgids_nl.o: tvgids_nl.cpp tvgids_nl.h provider.h scanconfig.h channels.h programs.h
 
-upc_nl.o: upc_nl.cpp upc_nl.h provider.h scanconfig.h threadpool.h
+horizon_nl.o: horizon_nl.cpp horizon_nl.h provider.h scanconfig.h threadpool.h
 
 functions.o: functions.cpp functions.h channels.h programs.h
 

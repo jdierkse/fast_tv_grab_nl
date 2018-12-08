@@ -8,18 +8,18 @@
 #include <boost/make_shared.hpp>
 #include <boost/regex.hpp>
 #include "functions.h"
-#include "upc_nl.h"
+#include "horizon_nl.h"
 
 
-UPCNL::UPCNL() :
+HorizonNL::HorizonNL() :
 	m_threadPool(4)
 {
 }
 
-Channels UPCNL::GetChannels() const
+Channels HorizonNL::GetChannels() const
 {
 	HttpData httpData;
-	std::string channelsString = httpData.GetUrlContents("https://www.horizon.tv/oesp/api/NL/nld/web/channels");
+	std::string channelsString = httpData.GetUrlContents("https://web-api-pepper.horizon.tv/oesp/api/NL/nld/web/channels");
 
 	Channels channels = LoadFromJSON(channelsString);
 	std::sort(channels.begin(), channels.end());
@@ -27,7 +27,7 @@ Channels UPCNL::GetChannels() const
 	return channels;
 }
 
-Programs UPCNL::GetPrograms(Channels& channels, const ScanConfig& scanConfig)
+Programs HorizonNL::GetPrograms(Channels& channels, const ScanConfig& scanConfig)
 {
 	Programs programs;
 
@@ -44,7 +44,7 @@ Programs UPCNL::GetPrograms(Channels& channels, const ScanConfig& scanConfig)
 	boost::shared_ptr<HttpData> pHttpData = boost::make_shared<HttpData>();
 
 	for (Channels::iterator it = channels.begin(); it != channels.end(); ++it, ++item)
-		m_threadPool.Execute(boost::bind(&UPCNL::GetChannelPrograms, this, *it, pHttpData, scanConfig, item, total));
+		m_threadPool.Execute(boost::bind(&HorizonNL::GetChannelPrograms, this, *it, pHttpData, scanConfig, item, total));
 
 	m_threadPool.Join();
 
@@ -76,7 +76,7 @@ Programs UPCNL::GetPrograms(Channels& channels, const ScanConfig& scanConfig)
 	return programs;
 }
 
-void UPCNL::GetChannelPrograms(Channel& channel, const boost::shared_ptr<HttpData>& pHttpData, const ScanConfig& scanConfig, int item, int total)
+void HorizonNL::GetChannelPrograms(Channel& channel, const boost::shared_ptr<HttpData>& pHttpData, const ScanConfig& scanConfig, int item, int total)
 {
 	int days = scanConfig.days;
 	int now = time(0);
@@ -91,14 +91,14 @@ void UPCNL::GetChannelPrograms(Channel& channel, const boost::shared_ptr<HttpDat
 	}
 
 	std::stringstream ss;
-	ss << "https://www.horizon.tv/oesp/api/NL/nld/web/listings?byStationId=" << channel.InternalId() << "&byStartTime=" << start << "000~&byEndTime=~" << end << "000&sort=startTime";
+	ss << "https://web-api-pepper.horizon.tv/oesp/api/NL/nld/web/listings?byStationId=" << channel.InternalId() << "&byStartTime=" << start << "000~&byEndTime=~" << end << "000&sort=startTime";
 	std::string programString = pHttpData->GetUrlContents(ss.str());
 
 	boost::unique_lock<boost::mutex> lock(m_mutex);
 	m_programs.push_back(std::make_pair(channel, programString));
 }
 
-Channels UPCNL::LoadFromJSON(const std::string& json) const
+Channels HorizonNL::LoadFromJSON(const std::string& json) const
 {
 	std::stringstream jsonStream;
 	jsonStream << json;
@@ -133,7 +133,7 @@ Channels UPCNL::LoadFromJSON(const std::string& json) const
 	return channels;
 }
 
-void UPCNL::LoadFromJSON(Programs& programs, const Channel& channel, const std::string& json) const
+void HorizonNL::LoadFromJSON(Programs& programs, const Channel& channel, const std::string& json) const
 {
 	std::stringstream jsonStream;
 	jsonStream << json;
@@ -231,7 +231,7 @@ void UPCNL::LoadFromJSON(Programs& programs, const Channel& channel, const std::
 	}
 }
 
-std::string UPCNL::ConvertGenre(const std::string& genre) const
+std::string HorizonNL::ConvertGenre(const std::string& genre) const
 {
 	if (genre == "news" || genre == "nieuws" ||
 	    genre == "nieuws/nieuws" || genre == "nieuws/nieuws/discussie" ||
@@ -291,7 +291,7 @@ std::string UPCNL::ConvertGenre(const std::string& genre) const
 	return genre;
 }
 
-std::string UPCNL::ConvertDate(int date) const
+std::string HorizonNL::ConvertDate(int date) const
 {
 	std::stringstream ss;
 	boost::posix_time::ptime time = boost::posix_time::from_time_t(date);
@@ -299,4 +299,3 @@ std::string UPCNL::ConvertDate(int date) const
 
 	return ss.str();
 }
-
